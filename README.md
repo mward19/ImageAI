@@ -7,9 +7,11 @@ Here is a 17 minute [Video](https://www.youtube.com/watch?v=DGojI9xcCfg) by Gran
 TODO(add more videos)
 
 ## Holiday To Dos
-* Read Min Xu paper, discuss on zulip
-* Make a "tree" of tomogram AI literature
-* Play with Braxtons CNN
-* Work on tutorial for NN and MLP
+* Read Min Xu paper, discuss on zulip (Gus, Braxton, ...)
+* Make a "tree" of tomogram AI literature (Gus, Braxton)
+* Play with Braxtons CNN (all)
+* Work on tutorial for NN and MLP (Gus)
+* Update github repo (Braxton)
+* Update anki with new stuff (Gus)
 
 
