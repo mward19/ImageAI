@@ -1,5 +1,9 @@
 # ImageSegmentation
-TODO(write intro here, metion papers dir)
+This repo serves as a guide for the BYU Image Segmentation group. Below, papers and videos are listed to introduce the topic of Tomogram AI.
+
+## Papers
+[Isonet](https://www.biorxiv.org/content/10.1101/2021.07.17.452128v1.full) is a deep learning-based software package that iteratively reconstructs the missing-wedge information and increases signal-to-noise ratio, using the knowledge learned from raw tomograms.
+
 
 ## Videos
 Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
