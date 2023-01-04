@@ -15,7 +15,7 @@ Here is a 17 minute [Video](https://www.youtube.com/watch?v=DGojI9xcCfg) by Gran
 TODO(add more videos)
 
 ## Examples
-There is not much currently in this directory, however it serves as a location for various "play" scripts for learning fundametals of Tomogram AI
+There is not much currently in this [directory](https://github.com/byu-biophysics/ImageSegmentation/tree/main/examples), however it serves as a location for various "play" scripts for learning fundametals of Tomogram AI. 
 
 ## Holiday To Dos
 * Read Min Xu paper, discuss on zulip (Gus, Braxton, ...)
