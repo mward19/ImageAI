@@ -14,6 +14,9 @@ Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introd
 Here is a 17 minute [Video](https://www.youtube.com/watch?v=DGojI9xcCfg) by Grant Sanderson in the MIT series. Working with images in Julia.<br>
 TODO(add more videos)
 
+## Examples
+There is not much currently in this directory, however it serves as a location for various "play" scripts for learning fundametals of Tomogram AI
+
 ## Holiday To Dos
 * Read Min Xu paper, discuss on zulip (Gus, Braxton, ...)
 * Make a "tree" of tomogram AI literature (Gus, Braxton)
