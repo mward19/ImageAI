@@ -1,4 +1,4 @@
-# ImageSegmentation
+# ImageAI
 This repo serves as a guide for the BYU Image Segmentation group. Below, papers and videos are listed to introduce the topic of Tomogram AI.
 
 ## Papers
