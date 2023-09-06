@@ -1,4 +1,20 @@
-# ImageAI
+# ImageAI Walkthru
+
+* Get an account on the supercomputer
+* Get Julia installed
+* Learn how to use unix
+* Do Chap 1 of Giordano and pass it off
+* Do Chap 2 of Giordano and pass it off
+* 
+
+## Videos
+Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
+Here is a 17 minute [Video](https://www.youtube.com/watch?v=DGojI9xcCfg) by Grant Sanderson in the MIT series. Working with images in Julia.<br>
+TODO(add more videos)
+(idea) NN from 3B1B (four videos)
+
+
+# ImageAI (Old)
 This repo serves as a guide for the BYU Image Segmentation group. Below, papers and videos are listed to introduce the topic of Tomogram AI.
 
 ## Papers
