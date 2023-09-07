@@ -1,11 +1,45 @@
 # ImageAI Walkthru
+1. Setup an account on and download Zulip. We will use this to communicate within our group.
+    * https://zulip.com
+    * Ask any group member to send you an invitation to our Zulip organization
+2.  Get an account on the supercomputer
+    * Go to https://rc.byu.edu
+    * Click on "Request an account" in the top right corner
+    * Follow the prompts to send your request, you will need to
+      login with your byu email and provide some information about our project
+    * 
+          - Professor Hart's id is glh43. When asked for info about your project,
+            just say that you are working on an imageAI biophysics project sorting
+            pictures of the flagellar motor.You will be doing machine learning and
+            will be using PyTorch. One job at a time requesting up to 16GB on a GPU.
+    * After about a day you should receive an email on your byu email saying that your request has been approved or denied.
+      * If it is denied: ->let us know in the ImageAI channel on Zulip. Give the reasoning why.
+      * If it is approved: ->You are ready to proceed and access the Supercomputer!
+    * Return to https://rc.byu.edu and login. Under 'Documentation' click 'Logging in'
+    * Download Google Authenticator and set it up using the 'Two factor Authentication' link at the bottom of the page
+    * If using Mac (GOOD JOB!) open terminal and type  "ssh *username*@ssh.rc.byu.edu" replacing *username* with yours
+    * You will then be prompted to enter your password you made on the rc.byu website followed by your 6-digit authentication code (google authenticator)
+    * You will not immediately have access to the group's shared files and directories.
+    * Begin following the tutorials under the documentation section of the rc website. (Most of the YT vids are out of date but there are a few seminars from 2020 you can look at. Mainly just focus on '**Linux tutorial**'. This will teach you how to navigate the supercomputer.)
+    * Once you feel comfortable with the LinuxOS let us know and we will give you access to our shared group directory.
+    * Linux Cheat Sheet: https://docs.google.com/document/d/1rwuWKhjxmHehSVlJTS4vgwJxQZZZxg5z0vF_GyNLXE0/edit?usp=sharing
+3.  Get Julia installed
+    * Go to https://julialang.org/downloads/
+    * If using Mac, be sure to check which processor/chip your computer has. (APPLE LOGO, About this Mac)
+        * If it says "Chip" anywhere, be sure to download the Apple Silicon .dmg file.
+        * If it says "Processor" anwhere, be sure to download the Intel .dmg .
+    * Follow the instructions to get Julia up and running!
+4.  Install VScode
+    * Go to https://code.visualstudio.com/download
+    * Be sure to follow the same rules about the chip/processor
+    * Install the Julia extension
+      * Open VScode and press command[⌘], shift[⇧], [X]
+      * Search Julia and install the 'Julia Language Support' extension
+    * You are now ready to use Julia in VScode!
 
-* Get an account on the supercomputer
-* Get Julia installed
-* Learn how to use unix
-* Do Chap 1 of Giordano and pass it off
-* Do Chap 2 of Giordano and pass it off
-* 
+5.  Do Chap 1 of Giordano and pass it off https://docs.google.com/document/d/1rwuWKhjxmHehSVlJTS4vgwJxQZZZxg5z0vF_GyNLXE0/edit?usp=sharing
+6.  Do Chap 2 of Giordano and pass it off
+7.  Chapter 9 of Giordano and pass it off https://drive.google.com/file/d/1BCQRPmtMEenXVu_XzrxrnTZpE25JDtSp/view?usp=share_link
 
 ## Videos
 Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
