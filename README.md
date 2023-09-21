@@ -37,9 +37,7 @@
       * Search Julia and install the 'Julia Language Support' extension
     * You are now ready to use Julia in VScode!
 
-5.  Do Chap 1 of Giordano and pass it off https://docs.google.com/document/d/1rwuWKhjxmHehSVlJTS4vgwJxQZZZxg5z0vF_GyNLXE0/edit?usp=sharing
-6.  Do Chap 2 of Giordano and pass it off
-7.  Chapter 9 of Giordano and pass it off https://drive.google.com/file/d/1BCQRPmtMEenXVu_XzrxrnTZpE25JDtSp/view?usp=share_link
+5.  Do Chapters 1, 2, and 9 of Giordano and pass it off [https://docs.google.com/document/d/1rwuWKhjxmHehSVlJTS4vgwJxQZZZxg5z0vF_GyNLXE0/edit?usp=sharing](https://drive.google.com/drive/folders/1fRZ3O7edJSBFz9f5hYGVnzf6_JLeRBmc?usp=sharing)
 
 ## Videos
 Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
