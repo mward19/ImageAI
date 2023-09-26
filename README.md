@@ -36,6 +36,10 @@
       * Open VScode and press command[⌘], shift[⇧], [X]
       * Search Julia and install the 'Julia Language Support' extension
     * You are now ready to use Julia in VScode!
+5.   Install IMOD
+    * Go to https://bio3d.colorado.edu/imod/download.html
+    * Select Linux, Mac, or Windows and then install the IMOD package using the one-click installer link or the command-line link
+    * Once installed, use the command imodinfo to verify that you have downloaded it correctly      
 
 5.  Do Chap 1 of Giordano and pass it off https://docs.google.com/document/d/1rwuWKhjxmHehSVlJTS4vgwJxQZZZxg5z0vF_GyNLXE0/edit?usp=sharing
 6.  Do Chap 2 of Giordano and pass it off
