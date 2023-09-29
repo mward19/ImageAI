@@ -8,8 +8,8 @@
 #              specified thickness. Currently thickness is defined as specifice z_slice to z_slice + thickness.
 #
 # TODO:
-# Try z_slice - thickness to z_slice
-# Try z_slice - thickness/2 to z_slice + thickness/2 (carful here as you wont always get integers) 
+# Try z_center - thickness to z_center
+# Try z_center - thickness/2 to z_center + thickness/2 (carful here as you wont always get integers) 
 #
 # Usage: ./extract_sa_slices.sh <input file> <slicer angles file> <thickness>
 #
@@ -61,14 +61,14 @@ for angles in $slicer_angles; do
 	rot_z="${my_array[2]}"
 	x_center="${my_array[3]}"
 	y_center="${my_array[4]}"
-	z_slice="${my_array[5]}"
+	z_center="${my_array[5]}"
 
 	# Rotate the input MRC file based on the angles
-	rotatevol  "$input_file" "$rotated_file" -angles "$rot_z,$rot_y,$rot_x"
+	rotatevol  "$input_file" "$rotated_file" -center "$x_center,$y_center,$z_center" -angles "$rot_z,$rot_y,$rot_x"
 
 	# Create a new stack averaging the slices
 	echo "$selected_file"
-	newstack -input "$rotated_file" -output "$selected_file" -secs "$z_slice-$((z_slice+thickness))"
+	newstack -input "$rotated_file" -output "$selected_file" -secs "$((z_center-thickness/2))-$((z_center+thickness/2))"
 
 	# Remove the rotated file
 	rm "$rotated_file"
