@@ -1,7 +1,9 @@
 useful_scripts is a directory that contains useful scripts to assist with IMAGEAI
 
-# TODO: write the man doc for this script
-extract_sa_slices.sh (extract slicer angles slices)
-- this takes in an input file, output file and slicer angle mod file.
-- uses imodinfo to extract slicer angles
-- uses newstack to get specific 
+
+
+Script Name: extract_sa_slices.sh
+Description: extrast_sa_slices(Extract Slicer Angle Slices) takes an input MRC file, a slicer angles file, and a
+             thickness value. It rotates the MRC file based on the angles
+             provided in the slicer angles file and extracts slices of the
+             specified thickness.
