@@ -2,6 +2,7 @@
 
 ## TODO:
 1. FSL Groups (Braxton is an group manager so he can add as well as Gus)
+2. Quartz(along with X11 forwarding: denoted by -X option for ssh) for using GUI on Super Computer
 
 1. Setup an account on and download Zulip. We will use this to communicate within our group.
     * https://zulip.com
