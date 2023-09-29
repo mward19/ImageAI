@@ -42,9 +42,27 @@
       * Search Julia and install the 'Julia Language Support' extension
     * You are now ready to use Julia in VScode!
 
-5.  Do Chap 1 of Giordano and pass it off https://docs.google.com/document/d/1rwuWKhjxmHehSVlJTS4vgwJxQZZZxg5z0vF_GyNLXE0/edit?usp=sharing
-6.  Do Chap 2 of Giordano and pass it off
-7.  Chapter 9 of Giordano and pass it off https://drive.google.com/file/d/1BCQRPmtMEenXVu_XzrxrnTZpE25JDtSp/view?usp=share_link
+5.  Do Chapters 1, 2, and 9 of Giordano and pass it off [https://docs.google.com/document/d/1rwuWKhjxmHehSVlJTS4vgwJxQZZZxg5z0vF_GyNLXE0/edit?usp=sharing](https://drive.google.com/drive/folders/1fRZ3O7edJSBFz9f5hYGVnzf6_JLeRBmc?usp=sharing)
+6.  Install Anaconda and Python
+   *
+   * 
+
+## Getting started with MNIST
+Congratulations! You have finished the warmup and setup and are now ready to get started workin with AI. We will start with the MNIST data set.
+1. Setting up PyTorch
+   * Tutorial video: https://www.youtube.com/watch?v=v43SlgBcZ5Y&t=773s
+   * In your terminal write: `conda create --name pytorch2`
+   * Go to https://pytorch.org/get-started/locally/ and install PyTorch according to your OS, copy and paste the command it gives you
+   * Back in your terminal write `conda activate torch`
+   * 
+
+
+## Github
+Tutorial videos:
+https://www.youtube.com/watch?v=tRZGeaHPoaw
+https://www.youtube.com/watch?v=8Dd7KRpKeaE&t=988s
+Markdown cheat sheet
+https://www.markdownguide.org/cheat-sheet/
 
 ## Videos
 Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
