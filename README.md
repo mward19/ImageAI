@@ -1,4 +1,8 @@
 # ImageAI Walkthru
+
+## TODO:
+1. FSL Groups (Braxton is an group manager so he can add as well as Gus)
+
 1. Setup an account on and download Zulip. We will use this to communicate within our group.
     * https://zulip.com
     * Ask any group member to send you an invitation to our Zulip organization
@@ -74,5 +78,4 @@ There is not much currently in this [directory](https://github.com/byu-biophysic
 * Work on tutorial for NN and MLP (Gus)
 * Update github repo (Braxton)
 * Update anki with new stuff (Gus)
-
 
