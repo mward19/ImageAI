@@ -64,20 +64,21 @@ for angles in $slicer_angles; do
 	z_center="${my_array[5]}"
 
 	# Rotate the input MRC file based on the angles
-	rotatevol  "$input_file" "$rotated_file" -center "$x_center,$y_center,$z_center" -angles "$rot_z,$rot_y,$rot_x"
+	rotatevol  "$input_file" "$rotated_file" -siz 256,256,$thickness -center "$x_center,$y_center,$z_center" -angles "$rot_z,$rot_y,$rot_x"
 
 	# Create a new stack averaging the slices
-	echo "$selected_file"
-	newstack -input "$rotated_file" -output "$selected_file" -secs "$((z_center-thickness/2))-$((z_center+thickness/2))"
+	# echo "$selected_file"
+	# newstack -input "$rotated_file" -output "$selected_file" -secs "$((z_center-thickness))-$((z_center+thickness))"
 
 	# Remove the rotated file
-	rm "$rotated_file"
+	# rm "$rotated_file"
 
 	# Average the slices in the selected stack
-	clip average "$selected_file" "$output_file"
+	clip average "$rotated_file" "$output_file"
 
 	# Remove the selected file
 	rm "$selected_file"
+	rm "$rotated_file"
 
 	# Increment the counter
 	i=$((i+1))
