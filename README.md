@@ -34,7 +34,7 @@
         * If it says "Processor" anwhere, be sure to download the Intel .dmg .
     * Follow the instructions to get Julia up and running!
 4.  Install VScode
-    * VScode is great, however, any ide or text editor will work. If you are feeling brave try []()
+    * VScode is great, however, any ide or text editor will work. If you are feeling brave try [vim](https://www.vim.org/)
     * Go to https://code.visualstudio.com/download
     * Be sure to follow the same rules about the chip/processor
     * Install the Julia extension
