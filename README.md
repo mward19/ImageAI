@@ -62,11 +62,8 @@ Congratulations! You have finished the warmup and setup and are now ready to get
 
 
 ## Github
-Tutorial videos:
-https://www.youtube.com/watch?v=tRZGeaHPoaw
-https://www.youtube.com/watch?v=8Dd7KRpKeaE&t=988s
-Markdown cheat sheet
-https://www.markdownguide.org/cheat-sheet/
+Understand the full [quickstart section](https://docs.github.com/en/get-started)
+[Markdown cheat sheet](https://www.markdownguide.org/cheat-sheet/)
 
 ## Videos
 Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
