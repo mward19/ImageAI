@@ -64,8 +64,6 @@ Congratulations! You have finished the warmup and setup and are now ready to get
 ## Github
 Understand the full [quickstart section](https://docs.github.com/en/get-started)
 
-[Markdown cheat sheet](https://www.markdownguide.org/cheat-sheet/)
-
 ## Videos
 Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
 Here is a 17 minute [Video](https://www.youtube.com/watch?v=DGojI9xcCfg) by Grant Sanderson in the MIT series. Working with images in Julia.<br>
