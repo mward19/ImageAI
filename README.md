@@ -63,6 +63,7 @@ Congratulations! You have finished the warmup and setup and are now ready to get
 
 ## Github
 Understand the full [quickstart section](https://docs.github.com/en/get-started)
+
 [Markdown cheat sheet](https://www.markdownguide.org/cheat-sheet/)
 
 ## Videos
