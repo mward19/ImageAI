@@ -34,18 +34,19 @@
         * If it says "Processor" anwhere, be sure to download the Intel .dmg .
     * Follow the instructions to get Julia up and running!
 4.  Install VScode
+    * VScode is great, however, any ide or text editor will work. If you are feeling brave try []()
     * Go to https://code.visualstudio.com/download
     * Be sure to follow the same rules about the chip/processor
     * Install the Julia extension
       * Open VScode and press command[⌘], shift[⇧], [X]
       * Search Julia and install the 'Julia Language Support' extension
     * You are now ready to use Julia in VScode!
-5.   Install IMOD
+6.   Install IMOD
     * Go to https://bio3d.colorado.edu/imod/download.html
     * Select Linux, Mac, or Windows and then install the IMOD package using the one-click installer link or the command-line link
     * Once installed, use the command imodinfo to verify that you have downloaded it correctly      
 
-5.  Do Chapters 1, 2, and 9 of Giordano and pass it off [https://docs.google.com/document/d/1rwuWKhjxmHehSVlJTS4vgwJxQZZZxg5z0vF_GyNLXE0/edit?usp=sharing](https://drive.google.com/drive/folders/1fRZ3O7edJSBFz9f5hYGVnzf6_JLeRBmc?usp=sharing)
+5.  Do Chapters 1, 2, and 9 of [Giordano](https://drive.google.com/drive/folders/1fRZ3O7edJSBFz9f5hYGVnzf6_JLeRBmc?usp=sharing) and pass it off
 6.  Install Anaconda and Python
    *
    * 
