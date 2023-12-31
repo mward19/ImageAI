@@ -19,8 +19,8 @@
     * After about a day you should receive an email on your byu email saying that your request has been approved or denied.
       * If it is denied: ->let us know in the ImageAI channel on Zulip. Give the reasoning why.
       * If it is approved: ->You are ready to proceed and access the Supercomputer!
-    * Return to https://rc.byu.edu and login. Under 'Documentation' click 'Logging in'
-    * Download Google Authenticator and set it up using the 'Two factor Authentication' link at the bottom of the page
+    * Download Google Authenticator
+    * Return to https://rc.byu.edu and login. Set up two factor authentication using the QR code on the website.
     * If using Mac (GOOD JOB!) open terminal and type  "ssh *username*@ssh.rc.byu.edu" replacing *username* with yours
     * You will then be prompted to enter your password you made on the rc.byu website followed by your 6-digit authentication code (google authenticator)
     * You will not immediately have access to the group's shared files and directories.
@@ -48,8 +48,6 @@
 
 5.  Do Chapters 1, 2, and 9 of [Giordano](https://drive.google.com/drive/folders/1fRZ3O7edJSBFz9f5hYGVnzf6_JLeRBmc?usp=sharing) and pass it off
 6.  Install Anaconda and Python
-   *
-   * 
 
 ## Getting started with MNIST
 Congratulations! You have finished the warmup and setup and are now ready to get started workin with AI. We will start with the MNIST data set.
@@ -89,12 +87,3 @@ TODO(add more videos)
 
 ## Examples
 There is not much currently in this [directory](https://github.com/byu-biophysics/ImageSegmentation/tree/main/examples), however it serves as a location for various "play" scripts for learning fundametals of Tomogram AI. 
-
-## Holiday To Dos
-* Read Min Xu paper, discuss on zulip (Gus, Braxton, ...)
-* Make a "tree" of tomogram AI literature (Gus, Braxton)
-* Play with Braxtons CNN (all)
-* Work on tutorial for NN and MLP (Gus)
-* Update github repo (Braxton)
-* Update anki with new stuff (Gus)
-
