@@ -3,6 +3,10 @@
 - Quartz(along with X11 forwarding: denoted by -X option for ssh) for using GUI on Super Computer
 - Access super computer via vscode (consider .ssh/config option for setting up alias and multiplexing i.e. ssh sc)
 # ImageAI Walkthru
+
+## Github
+Understand the full [quickstart section](https://docs.github.com/en/get-started)
+
 1. Setup an account on and download Zulip. We will use this to communicate within our group.
     * https://zulip.com
     * Ask any group member to send you an invitation to our Zulip organization
@@ -57,10 +61,6 @@ Congratulations! You have finished the warmup and setup and are now ready to get
    * Go to https://pytorch.org/get-started/locally/ and install PyTorch according to your OS, copy and paste the command it gives you
    * Back in your terminal write `conda activate torch`
    * 
-
-
-## Github
-Understand the full [quickstart section](https://docs.github.com/en/get-started)
 
 ## Videos
 Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
