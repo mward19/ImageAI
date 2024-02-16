@@ -1,0 +1,5 @@
+train: /content/ImageAI/kaggle_dataset/train
+val: /content/ImageAI/kaggle_dataset/val
+
+nc: 1
+names: ['flagellar motor']
