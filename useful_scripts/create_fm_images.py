@@ -5,6 +5,34 @@ from PIL import Image
 import os
 import glob
 
+"""
+This script is designed for processing and analyzing tomography data, specifically targeting flagellar motors in biological samples. It utilizes a series of image processing and analysis techniques to extract, normalize, rotate, and generate frame images from volumetric data. The script automates the extraction of angles from .mod files, normalizes and rotates volumes based on these angles, and slices the rotated volumes into 2D frame images.
+
+Dependencies:
+- subprocess: For executing shell commands within Python.
+- numpy: Used for numerical operations, especially array manipulations.
+- mrcfile: For reading and writing MRC files, which are commonly used in electron microscopy and tomography.
+- PIL (Python Imaging Library): For image processing tasks, such as saving arrays as images.
+- os, glob: For navigating the file system and searching for files matching specific patterns.
+
+Main Functions:
+- mod_to_csv(modfile, output_path): Extracts rotation angles from .mod files and saves them to a CSV file.
+- robust_normalize_image(image): Normalizes image intensities to enhance contrast while avoiding outliers.
+- new_rotate_vol(input_file, labels, thickness, output_path, temp_dir): Rotates volumetric data based on specified angles and extracts averaged 2D frames.
+- get_frames(rotated_vol, num_frames, size, datadir): Generates and saves frame images from the rotated volume, with options for random cropping.
+- find_files(root_dir): Searches a directory tree for .mod and .rec files, returning their paths along with the names of their parent directories.
+- main(): Orchestrates the workflow by calling the functions defined above with appropriate arguments based on the file system structure and desired processing parameters.
+
+Usage:
+This script is intended to be run as a standalone program. Adjust the
+`main_dir`, `temp_dir`, and `datadir` variables to match your file system
+layout before execution. The script processes all files with pattern: "FM*.mod"
+as well as the corresponding .rec files found within the `main_dir` directory, applying the described image processing and analysis techniques.
+
+Author: Braxton Owens
+Date: Feb 28 2024
+"""
+
 def mod_to_csv(modfile, output_path):
     bash_command = f"imodinfo -a {modfile} | grep '^slicerAngle' | awk '{{print $(NF-5)\",\"$(NF-4)\",\"$(NF-3)\",\"$(NF-2)\",\"$(NF-1)\",\"$NF}}' > {output_path}"
     subprocess.run(bash_command, shell=True)
@@ -58,14 +86,14 @@ def get_frames(rotated_vol, num_frames, size, datadir):
 def find_files(root_dir):
     mod_files = []
     rec_files = []
-    dir_names = []  # To store the directory names
+    dir_names = []
     for dirpath, dirnames, filenames in os.walk(root_dir):
         for mod_file in glob.glob(os.path.join(dirpath, 'FM*.mod')):
             rec_file_list = glob.glob(os.path.join(dirpath, '*.rec'))
             if rec_file_list:
                 mod_files.append(mod_file)
                 rec_files.append(rec_file_list[0])
-                dir_name = os.path.basename(dirpath)  # Extract the last part of the dirpath
+                dir_name = os.path.basename(dirpath)
                 dir_names.append(dir_name)
     return mod_files, rec_files, dir_names
 
