@@ -34,8 +34,13 @@ Date: Feb 28 2024
 """
 
 def mod_to_csv(modfile, output_path):
-    bash_command = f"imodinfo -a {modfile} | grep '^slicerAngle' | awk '{{print $(NF-5)\",\"$(NF-4)\",\"$(NF-3)\",\"$(NF-2)\",\"$(NF-1)\",\"$NF}}' > {output_path}"
-    subprocess.run(bash_command, shell=True)
+    try:
+        bash_command = f"imodinfo -a {modfile} | grep '^slicerAngle' | awk '{{print $(NF-5),$(NF-4),$(NF-3),$(NF-2),$(NF-1),$NF}}' > {output_path}"
+        subprocess.run(bash_command, shell=True, check=True)
+        return True
+    except subprocess.CalledProcessError:
+        print(f"Failed to convert {modfile} to CSV.")
+        return False
 
 def robust_normalize_image(image):
     p01, p99 = np.percentile(image, [1, 99])
@@ -44,7 +49,7 @@ def robust_normalize_image(image):
     return normalized_image.astype(np.uint8)
 
 def new_rotate_vol(input_file, labels, thickness, output_path, temp_dir):
-    my_labels = np.loadtxt(labels, delimiter=',')
+    my_labels = np.loadtxt(labels, delimiter=' ')
     if my_labels.ndim == 1:
         my_labels = np.reshape(my_labels, (1, -1))
     for i, label in enumerate(my_labels):
@@ -97,20 +102,33 @@ def find_files(root_dir):
                 dir_names.append(dir_name)
     return mod_files, rec_files, dir_names
 
+def is_csv_empty(file_path):
+    try:
+        return os.path.getsize(file_path) == 0
+    except OSError:
+        return True
+
 def main():
     main_dir = '/home/cbo27/fsl_groups/grp_tomo_db1_d2/compute/TomoDB1_d2/FlagellarMotor_P2'
     temp_dir = '/home/cbo27/fsl_groups/grp_tomo_db1_d2/braxton/temp_dir'
     datadir = '/home/cbo27/fsl_groups/grp_tomo_db1_d2/braxton/all_imgs'
+    skipped_dirs_log_path = '/home/cbo27/fsl_groups/grp_tomo_db1_d2/braxton/skipped_dirs.txt'
 
     mod_files, rec_files, dir_names = find_files(main_dir)
 
     if len(mod_files) != len(rec_files):
-        print("list not the same size")
+        print("List not the same size")
+
     for i, mod_file in enumerate(mod_files):
         output_path = os.path.join(temp_dir, f"{dir_names[i]}_averaged_{i}.arec")
-        mod_to_csv(mod_file, "label.csv")
+        
+        if not mod_to_csv(mod_file, "label.csv") or is_csv_empty("label.csv"):
+            with open(skipped_dirs_log_path, 'a') as log_file:
+                log_file.write(f"{dir_names[i]}\n") 
+            continue  
+        
         new_rotate_vol(rec_files[i], "label.csv", 15, output_path, temp_dir)
-        subprocess.run('rm label.csv', shell=True)
+        subprocess.run('rm label.csv', shell=True, check=False)
         get_frames(output_path, 5, 256, datadir)
 
 if __name__ == "__main__":
