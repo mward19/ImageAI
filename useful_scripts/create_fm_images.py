@@ -73,13 +73,13 @@ def get_frames(rotated_vol, num_frames, size, datadir):
         return
     for i in range(num_frames):
         with mrcfile.open(rotated_vol) as mrc:
-            img = mrc.data.astype(np.uint8)
+            img = mrc.data
         height, width = np.shape(img)
         if size > width:
             print("size is greater than image")
             return
         x_max = np.random.randint((width // 2) + 50, width // 2 + size)
-        y_max = np.random.randint((height // 2) + 50, width // 2 + size)
+        y_max = np.random.randint((height // 2) + 50, height // 2 + size)
         frame = img[x_max-size:x_max, y_max-size:y_max]
         n_frame = robust_normalize_image(frame)
         n_frame = np.flipud(n_frame)
@@ -93,13 +93,17 @@ def find_files(root_dir):
     rec_files = []
     dir_names = []
     for dirpath, dirnames, filenames in os.walk(root_dir):
-        for mod_file in glob.glob(os.path.join(dirpath, 'FM*.mod')):
+        for i,mod_file in enumerate(glob.glob(os.path.join(dirpath, 'FM*.mod'))):
             rec_file_list = glob.glob(os.path.join(dirpath, '*.rec'))
-            if rec_file_list:
+            for j,rec_file in enumerate(rec_file_list):
                 mod_files.append(mod_file)
-                rec_files.append(rec_file_list[0])
-                dir_name = os.path.basename(dirpath)
-                dir_names.append(dir_name)
+                rec_files.append(rec_file)
+                path_parts = dirpath.strip(os.path.sep).split(os.path.sep)
+                if len(path_parts) >= 2:
+                    last_two_dirs = f'{path_parts[-2]}_{path_parts[-1]}'
+                else:
+                    last_two_dirs = dirpath
+                dir_names.append(f'{last_two_dirs}_{i}_{j}')
     return mod_files, rec_files, dir_names
 
 def is_csv_empty(file_path):
