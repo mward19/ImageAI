@@ -55,6 +55,8 @@ def new_rotate_vol(input_file, labels, thickness, output_path, temp_dir):
     for i, label in enumerate(my_labels):
         with mrcfile.open(input_file) as mrc:
             z, height, width = mrc.data.shape
+            if height > 1000:
+                return True
         x_center, y_center, z_center = label[3:]
         x_rot, y_rot, z_rot = label[:3]
         temp_output_file = os.path.join(temp_dir, f"{os.path.basename(input_file)[:-4]}_tomo_{i}.rec")
@@ -86,6 +88,7 @@ def get_frames(rotated_vol, num_frames, size, datadir):
         im = Image.fromarray(n_frame)
         splittxt = os.path.splitext(os.path.basename(rotated_vol))[0]
         im.save(f"{datadir}/{splittxt}_frame{i}.png")
+        print(f"{datadir}/{splittxt}_frame{i}.png")
     subprocess.run(f'rm {rotated_vol}', shell=True)
 
 def find_files(root_dir):
@@ -112,6 +115,15 @@ def is_csv_empty(file_path):
     except OSError:
         return True
 
+def check_frames_exist(splittxt, datadir):
+    """Check if any frame images for a given volume already exist in datadir."""
+    frame_filename = f"{datadir}/{splittxt}_frame{0}.png"
+    print(f"{datadir}/{splittxt}_frame{0}.png")
+    if os.path.exists(frame_filename):
+        return True 
+    return False
+
+import time
 def main():
     main_dir = '/home/cbo27/fsl_groups/grp_tomo_db1_d2/compute/TomoDB1_d2/FlagellarMotor_P2'
     temp_dir = '/home/cbo27/fsl_groups/grp_tomo_db1_d2/braxton/temp_dir'
@@ -119,19 +131,23 @@ def main():
     skipped_dirs_log_path = '/home/cbo27/fsl_groups/grp_tomo_db1_d2/braxton/skipped_dirs.txt'
 
     mod_files, rec_files, dir_names = find_files(main_dir)
-
-    if len(mod_files) != len(rec_files):
-        print("List not the same size")
-
     for i, mod_file in enumerate(mod_files):
+        start_loop = time.time()
         output_path = os.path.join(temp_dir, f"{dir_names[i]}_averaged_{i}.arec")
         
+        splittxt = os.path.splitext(os.path.basename(output_path))[0]
+        if check_frames_exist(splittxt, datadir):
+            #print(f"Skipping {mod_file} as frames already exist in {datadir}")
+            continue
+        print("here")
         if not mod_to_csv(mod_file, "label.csv") or is_csv_empty("label.csv"):
             with open(skipped_dirs_log_path, 'a') as log_file:
                 log_file.write(f"{dir_names[i]}\n") 
             continue  
         
-        new_rotate_vol(rec_files[i], "label.csv", 15, output_path, temp_dir)
+        val = new_rotate_vol(rec_files[i], "label.csv", 15, output_path, temp_dir)
+        if val:
+            continue
         subprocess.run('rm label.csv', shell=True, check=False)
         get_frames(output_path, 5, 256, datadir)
 
