@@ -4,6 +4,7 @@ import mrcfile
 from PIL import Image
 import os
 import glob
+import time
 
 """
 This script is designed for processing and analyzing tomography data, specifically targeting flagellar motors in biological samples. It utilizes a series of image processing and analysis techniques to extract, normalize, rotate, and generate frame images from volumetric data. The script automates the extraction of angles from .mod files, normalizes and rotates volumes based on these angles, and slices the rotated volumes into 2D frame images.
@@ -60,7 +61,7 @@ def new_rotate_vol(input_file, labels, thickness, output_path, temp_dir):
         x_center, y_center, z_center = label[3:]
         x_rot, y_rot, z_rot = label[:3]
         temp_output_file = os.path.join(temp_dir, f"{os.path.basename(input_file)[:-4]}_tomo_{i}.rec")
-        cmd = f"rotatevol {input_file} {temp_output_file} -size {width},{height},{thickness} -center {x_center},{y_center},{z_center} -angles {z_rot},{y_rot},{x_rot}"
+        cmd = f"rotatevol {input_file} {temp_output_file} -size {width},{height},{thickness} -center {x_center},{y_center},{z_center} -angles {z_rot},{y_rot},{x_rot} -v 0"
         subprocess.run(cmd, shell=True)
         with mrcfile.open(temp_output_file) as mrc:
             my_data = mrc.data
@@ -70,16 +71,14 @@ def new_rotate_vol(input_file, labels, thickness, output_path, temp_dir):
         os.remove(temp_output_file)
 
 def get_frames(rotated_vol, num_frames, size, datadir):
-    if size < 60:
-        print("size is smaller than a typical flagella motor")
+    with mrcfile.open(rotated_vol) as mrc:
+        img = mrc.data
+    height, width = img.shape
+    if size > width:
+        print("size is greater than image")
         return
+    
     for i in range(num_frames):
-        with mrcfile.open(rotated_vol) as mrc:
-            img = mrc.data
-        height, width = np.shape(img)
-        if size > width:
-            print("size is greater than image")
-            return
         x_max = np.random.randint((width // 2) + 50, width // 2 + size)
         y_max = np.random.randint((height // 2) + 50, height // 2 + size)
         frame = img[x_max-size:x_max, y_max-size:y_max]
@@ -87,9 +86,9 @@ def get_frames(rotated_vol, num_frames, size, datadir):
         n_frame = np.flipud(n_frame)
         im = Image.fromarray(n_frame)
         splittxt = os.path.splitext(os.path.basename(rotated_vol))[0]
-        im.save(f"{datadir}/{splittxt}_frame{i}.png")
-        print(f"{datadir}/{splittxt}_frame{i}.png")
-    subprocess.run(f'rm {rotated_vol}', shell=True)
+        frame_path = f"{datadir}/{splittxt}_frame{i}.png"
+        im.save(frame_path)
+
 
 def find_files(root_dir):
     mod_files = []
@@ -115,15 +114,14 @@ def is_csv_empty(file_path):
     except OSError:
         return True
 
-def check_frames_exist(splittxt, datadir):
-    """Check if any frame images for a given volume already exist in datadir."""
-    frame_filename = f"{datadir}/{splittxt}_frame{0}.png"
-    print(f"{datadir}/{splittxt}_frame{0}.png")
-    if os.path.exists(frame_filename):
-        return True 
-    return False
+# def check_frames_exist(splittxt, datadir):
+#     """Check if any frame images for a given volume already exist in datadir."""
+#     frame_filename = f"{datadir}/{splittxt}_frame{0}.png"
+#     print(f"{datadir}/{splittxt}_frame{0}.png")
+#     if os.path.exists(frame_filename):
+#         return True 
+#     return False
 
-import time
 def main():
     main_dir = '/home/cbo27/fsl_groups/grp_tomo_db1_d2/compute/TomoDB1_d2/FlagellarMotor_P2'
     temp_dir = '/home/cbo27/fsl_groups/grp_tomo_db1_d2/braxton/temp_dir'
@@ -132,24 +130,25 @@ def main():
 
     mod_files, rec_files, dir_names = find_files(main_dir)
     for i, mod_file in enumerate(mod_files):
-        start_loop = time.time()
         output_path = os.path.join(temp_dir, f"{dir_names[i]}_averaged_{i}.arec")
         
-        splittxt = os.path.splitext(os.path.basename(output_path))[0]
-        if check_frames_exist(splittxt, datadir):
-            #print(f"Skipping {mod_file} as frames already exist in {datadir}")
-            continue
-        print("here")
+        # splittxt = os.path.splitext(os.path.basename(output_path))[0]
+        # if check_frames_exist(splittxt, datadir):
+        #     #print(f"Skipping {mod_file} as frames already exist in {datadir}")
+        #     continue
         if not mod_to_csv(mod_file, "label.csv") or is_csv_empty("label.csv"):
             with open(skipped_dirs_log_path, 'a') as log_file:
                 log_file.write(f"{dir_names[i]}\n") 
             continue  
-        
+        rotate_vol_time = time.time()
         val = new_rotate_vol(rec_files[i], "label.csv", 15, output_path, temp_dir)
+        print(f'time to rotate vol: {rotate_vol_time - time.time()}')
         if val:
             continue
         subprocess.run('rm label.csv', shell=True, check=False)
+        get_frames_time = time.time()
         get_frames(output_path, 5, 256, datadir)
+        print(f'time to get frames: {get_frames_time - time.time()}')
 
 if __name__ == "__main__":
     main()
