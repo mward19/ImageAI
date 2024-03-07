@@ -2,40 +2,14 @@ import subprocess
 import numpy as np
 import mrcfile
 import os
+import glob
 from PIL import Image
-
-"""
-This script is derived from create_fm_images.py, and is designed to generate images from tomograms that do not contain flagellar motors. 
-It is only designed to work on tomograms with a single motor present, and will not work on tomograms with multiple motors. The script will rotate the 
-tomogram to align the motor with the z-axis, and then split the tomogram into frames of a specified size, saving each frame as a .png file. 
-The script will skip any tomograms that contain multiple motors.
-
-Dependencies:
-- subprocess: For executing shell commands within Python.
-- numpy: Used for numerical operations, especially array manipulations.
-- mrcfile: For reading and writing MRC files, which are commonly used in electron microscopy and tomography.
-- PIL (Python Imaging Library): For image processing tasks, such as saving arrays as images.
-- os: For navigating the file system and searching for files matching specific patterns.
-
-Main Functions:
-get_negative_frames: This function takes a rotated tomogram and a set of motor labels, and splits the tomogram into frames of a specified size,
-saving each frame as a .png file. The function will skip any frames that contain the motor.
-
-Usage: This script should run as a standalone. Make sure you update your file paths before running the script, and if needed adjust the kind of .mod files it's finding.
-
-Author: Eben Lonsdale
-Date: 1 March 2024
-"""
+import time
 
 # the following functions are taken from Braxton's create_fm_images.py
 def mod_to_csv(modfile, output_path):
-    try:
-        bash_command = f"imodinfo -a {modfile} | grep '^slicerAngle' | awk '{{print $(NF-5),$(NF-4),$(NF-3),$(NF-2),$(NF-1),$NF}}' > {output_path}"
-        subprocess.run(bash_command, shell=True, check=True)
-        return True
-    except subprocess.CalledProcessError:
-        print(f"Failed to convert {modfile} to CSV.")
-        return False
+    bash_command = f"imodinfo -a {modfile} | grep '^slicerAngle' | awk '{{print $(NF-5),$(NF-4),$(NF-3),$(NF-2),$(NF-1),$NF}}' > {output_path}"
+    subprocess.run(bash_command, shell=True, check=True)
 
 def robust_normalize_image(image):
     p01, p99 = np.percentile(image, [1, 99])
@@ -55,7 +29,7 @@ def new_rotate_vol(input_file, labels, thickness, output_path, temp_dir):
         x_center, y_center, z_center = label[3:]
         x_rot, y_rot, z_rot = label[:3]
         temp_output_file = os.path.join(temp_dir, f"{os.path.basename(input_file)[:-4]}_tomo_{i}.rec")
-        cmd = f"rotatevol {input_file} {temp_output_file} -size {width},{height},{thickness} -center {x_center},{y_center},{z_center} -angles {z_rot},{y_rot},{x_rot} -v 0"
+        cmd = f"rotatevol {input_file} {temp_output_file} -size {width},{height},{thickness} -center {x_center},{y_center},{z_center} -angles {z_rot},{y_rot},{x_rot}"
         subprocess.run(cmd, shell=True)
         with mrcfile.open(temp_output_file) as mrc:
             my_data = mrc.data
@@ -89,14 +63,12 @@ def is_csv_empty(file_path):
         return True
 
 
-def get_negative_frames(rotated_vol, labels, datadir):
+def get_negative_frames(rotated_vol, labels, size, datadir):
     # open rec file
     with mrcfile.open(rotated_vol) as mrc:
         img = mrc.data
     height, width = img.shape
-    if size > width:
-        print("size is greater than image")
-        return
+    # load motor labels
     all_labels = np.loadtxt(labels, delimiter=' ')
     if len(all_labels) > 1:
         print("This script is currently only designed to work on tomograms with only one motor present. More than one gets tricky, sorry.")
@@ -112,7 +84,7 @@ def get_negative_frames(rotated_vol, labels, datadir):
     #     vertical_strips = np.array_split(horizontal_strips[i], x_split, axis=1)
     #     for j in range(x_split):
     #         tiled_img.append(vertical_strips[j])
-    # not sure how to keep track of motor location using np.array_split
+    # not sure how to keep track of motor location using np.array_split. This way may be faster though, come back to later maybe
 
     # reshape motor labels to 2D array if necessary
     if motor_labels.ndim == 1:
@@ -120,8 +92,12 @@ def get_negative_frames(rotated_vol, labels, datadir):
     motor_xycoords = (all_labels[4],all_labels[5])
 
     # define exclusion box around flagellar motor
-    exclusion_box_start = (motor_xycoords[0] - size//2, motor_xycoords[1] - size//2)
-    exclusion_box_end = (motor_xycoords[0] + size//2, motor_xycoords[1] + size//2)
+    if is_csv_empty(labels):
+        exclusion_box_start = (0,0)
+        exclusion_box_end = (0,0)
+    else:
+        exclusion_box_start = (motor_xycoords[0] - size//2, motor_xycoords[1] - size//2)
+        exclusion_box_end = (motor_xycoords[0] + size//2, motor_xycoords[1] + size//2)
 
     # split the image into frames and save each frame as a .png file, skipping the exclusion box
     for i in range(y_split):
@@ -135,23 +111,17 @@ def get_negative_frames(rotated_vol, labels, datadir):
                 frame_path = f"{datadir}/{splittxt}_frame_{i}_{j}.png"
                 im.save(frame_path)
 
-
-
-if __name__ == '__main__':
+def main():
     main_dir = '/home/ejl62/fsl_groups/grp_tomo_db1_d2/compute/TomoDB1_d2/FlagellarMotor_P2'
     temp_dir = '/home/ejl62/fsl_groups/grp_tomo_db1_d2/eben/temp_dir'
-    datadir = '/home/ejl62/fsl_groups/grp_tomo_db1_d2/eben/all_imgs'
-    skipped_dirs_log_path = '/home/ejl62/fsl_groups/grp_tomo_db1_d2/braxton/skipped_dirs.txt'
+    datadir = '/home/ejl62/fsl_groups/grp_tomo_db1_d2/eben/all_neg_imgs'
+    skipped_dirs_log_path = '/home/ejl62/fsl_groups/grp_tomo_db1_d2/eben/skipped_dirs.txt'
 
     mod_files, rec_files, dir_names = find_files(main_dir)
     for i, mod_file in enumerate(mod_files):
-        output_path = os.path.join(temp_dir, f"{dir_names[i]}_averaged_{i}.arec")
+        output_path = os.path.join(temp_dir, f"{dir_names[i]}_averaged_neg_{i}.arec")
         
-        # splittxt = os.path.splitext(os.path.basename(output_path))[0]
-        # if check_frames_exist(splittxt, datadir):
-        #     #print(f"Skipping {mod_file} as frames already exist in {datadir}")
-        #     continue
-        if not mod_to_csv(mod_file, "label.csv") or is_csv_empty("label.csv"):
+        if not mod_to_csv(mod_file, "label.csv"): 
             with open(skipped_dirs_log_path, 'a') as log_file:
                 log_file.write(f"{dir_names[i]}\n") 
             continue  
@@ -160,7 +130,10 @@ if __name__ == '__main__':
         print(f'time to rotate vol: {rotate_vol_time - time.time()}')
         if val:
             continue
-        subprocess.run('rm label.csv', shell=True, check=False)
         get_frames_time = time.time()
-        get_negative_frames(output_path, 5, 256, datadir)
+        get_negative_frames(output_path, "label.csv", 256, datadir)
         print(f'time to get frames: {get_frames_time - time.time()}')
+        subprocess.run('rm label.csv', shell=True, check=False)
+
+if __name__ == "__main__":
+    main()
