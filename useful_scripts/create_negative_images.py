@@ -86,29 +86,26 @@ def get_negative_frames(rotated_vol, labels, size, datadir):
     #         tiled_img.append(vertical_strips[j])
     # not sure how to keep track of motor location using np.array_split. This way may be faster though, come back to later maybe
 
-    # reshape motor labels to 2D array if necessary
-    if motor_labels.ndim == 1:
-        motor_labels = np.reshape(motor_labels, (1, -1))
-    motor_xycoords = (all_labels[4],all_labels[5])
 
     # define exclusion box around flagellar motor
     if is_csv_empty(labels):
         exclusion_box_start = (0,0)
         exclusion_box_end = (0,0)
     else:
-        exclusion_box_start = (motor_xycoords[0] - size//2, motor_xycoords[1] - size//2)
-        exclusion_box_end = (motor_xycoords[0] + size//2, motor_xycoords[1] + size//2)
+        motor_xycoords = (all_labels[4],all_labels[5])
+        exclusion_box_start = (motor_xycoords[0] - 30, motor_xycoords[1] - 30)
+        exclusion_box_end = (motor_xycoords[0] + 30, motor_xycoords[1] + 30)
 
     # split the image into frames and save each frame as a .png file, skipping the exclusion box
-    for i in range(y_split):
-        for j in range(x_split):
+    for i in range(y_split-1):
+        for j in range(x_split-1):
             if (i*size < exclusion_box_start[0] or i*size > exclusion_box_end[0]) and (j*size < exclusion_box_start[1] or j*size > exclusion_box_end[1]):
                 frame = img[i*size:(i+1)*size, j*size:(j+1)*size]
                 n_frame = robust_normalize_image(frame)
                 n_frame = np.flipud(n_frame)
                 im = Image.fromarray(n_frame)
                 splittxt = os.path.splittext(os.path.basename(rotated_vol))[0]
-                frame_path = f"{datadir}/{splittxt}_frame_{i}_{j}.png"
+                frame_path = f"{datadir}/{splittxt}_frame{i}{j}.png"
                 im.save(frame_path)
 
 def main():
@@ -119,9 +116,9 @@ def main():
 
     mod_files, rec_files, dir_names = find_files(main_dir)
     for i, mod_file in enumerate(mod_files):
-        output_path = os.path.join(temp_dir, f"{dir_names[i]}_averaged_neg_{i}.arec")
-        
-        if not mod_to_csv(mod_file, "label.csv"): 
+        output_path = os.path.join(temp_dir, f"{dir_names[i]}_averaged_{i}.arec")
+    
+        if not mod_to_csv(mod_file, "label.csv") or is_csv_empty("label.csv"):
             with open(skipped_dirs_log_path, 'a') as log_file:
                 log_file.write(f"{dir_names[i]}\n") 
             continue  
@@ -130,6 +127,7 @@ def main():
         print(f'time to rotate vol: {rotate_vol_time - time.time()}')
         if val:
             continue
+        subprocess.run('rm label.csv', shell=True, check=False)
         get_frames_time = time.time()
         get_negative_frames(output_path, "label.csv", 256, datadir)
         print(f'time to get frames: {get_frames_time - time.time()}')
