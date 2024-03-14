@@ -5,6 +5,7 @@ import os
 import glob
 from PIL import Image
 import time
+import csv
 
 # the following functions are taken from Braxton's create_fm_images.py
 def mod_to_csv(modfile, output_path):
@@ -61,6 +62,12 @@ def is_csv_empty(file_path):
         return os.path.getsize(file_path) == 0
     except OSError:
         return True
+    
+def get_csv_length(file_path):
+    with open(file_path, 'r') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+        return len(data)
 
 
 def get_negative_frames(rotated_vol, labels, size, datadir):
@@ -70,7 +77,7 @@ def get_negative_frames(rotated_vol, labels, size, datadir):
     height, width = img.shape
     # load motor labels
     all_labels = np.loadtxt(labels, delimiter=' ')
-    if len(all_labels) > 1:
+    if get_csv_length(labels) > 1:
         print("This script is currently only designed to work on tomograms with only one motor present. More than one gets tricky, sorry.")
         return
 
@@ -104,8 +111,8 @@ def get_negative_frames(rotated_vol, labels, size, datadir):
                 n_frame = robust_normalize_image(frame)
                 n_frame = np.flipud(n_frame)
                 im = Image.fromarray(n_frame)
-                splittxt = os.path.splittext(os.path.basename(rotated_vol))[0]
-                frame_path = f"{datadir}/{splittxt}_frame{i}{j}.png"
+                splittxt = os.path.splitext(os.path.basename(rotated_vol))[0]
+                frame_path = f"{datadir}/{splittxt}_frame{i}_{j}.png"
                 im.save(frame_path)
 
 def main():
