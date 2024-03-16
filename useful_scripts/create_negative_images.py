@@ -98,15 +98,9 @@ def get_negative_frames(rotated_vol, labels, size, datadir):
     if is_csv_empty(labels):
         exclusion_box_start = (0,0)
         exclusion_box_end = (0,0)
-    else:
-        motor_xycoords = (all_labels[4],all_labels[5])
-        exclusion_box_start = (motor_xycoords[0] - 30, motor_xycoords[1] - 30)
-        exclusion_box_end = (motor_xycoords[0] + 30, motor_xycoords[1] + 30)
-
-    # split the image into frames and save each frame as a .png file, skipping the exclusion box
-    for i in range(y_split-1):
-        for j in range(x_split-1):
-            if (i*size < exclusion_box_start[0] or i*size > exclusion_box_end[0]) and (j*size < exclusion_box_start[1] or j*size > exclusion_box_end[1]):
+        # split the image into frames and save each frame as a .png file
+        for i in range(y_split-1):
+            for j in range(x_split-1):
                 frame = img[i*size:(i+1)*size, j*size:(j+1)*size]
                 n_frame = robust_normalize_image(frame)
                 n_frame = np.flipud(n_frame)
@@ -114,6 +108,22 @@ def get_negative_frames(rotated_vol, labels, size, datadir):
                 splittxt = os.path.splitext(os.path.basename(rotated_vol))[0]
                 frame_path = f"{datadir}/{splittxt}_frame{i}_{j}.png"
                 im.save(frame_path)
+    else:
+        motor_xycoords = (all_labels[4],all_labels[5])
+        exclusion_box_start = (motor_xycoords[0] - 30, motor_xycoords[1] - 30)
+        exclusion_box_end = (motor_xycoords[0] + 30, motor_xycoords[1] + 30)
+        # split the image into frames and save each frame as a .png file, skipping the exclusion box
+        for i in range(y_split-1):
+            for j in range(x_split-1):
+                if (i*size < exclusion_box_start[0] or i*size > exclusion_box_end[0]) and (j*size < exclusion_box_start[1] or j*size > exclusion_box_end[1]):
+                    frame = img[i*size:(i+1)*size, j*size:(j+1)*size]
+                    n_frame = robust_normalize_image(frame)
+                    n_frame = np.flipud(n_frame)
+                    im = Image.fromarray(n_frame)
+                    splittxt = os.path.splitext(os.path.basename(rotated_vol))[0]
+                    frame_path = f"{datadir}/{splittxt}_frame{i}_{j}.png"
+                    im.save(frame_path)
+    
 
 def main():
     main_dir = '/home/ejl62/fsl_groups/grp_tomo_db1_d2/compute/TomoDB1_d2/FlagellarMotor_P2'
