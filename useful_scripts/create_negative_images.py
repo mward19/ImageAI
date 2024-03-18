@@ -94,12 +94,10 @@ def get_negative_frames(rotated_vol, labels, size, datadir):
     # not sure how to keep track of motor location using np.array_split. This way may be faster though, come back to later maybe
 
 
-    # define exclusion box around flagellar motor
+    # check if a motor is present in the slice
     if is_csv_empty(labels):
-        exclusion_box_start = (0,0)
-        exclusion_box_end = (0,0)
-        # split the image into frames and save each frame as a .png file
-        for i in range(y_split-1):
+        # tile the image and save each frame as a .png file
+        for i in range(y_split-1): # n-1 to stay inside the bounds of the image
             for j in range(x_split-1):
                 frame = img[i*size:(i+1)*size, j*size:(j+1)*size]
                 n_frame = robust_normalize_image(frame)
@@ -109,6 +107,7 @@ def get_negative_frames(rotated_vol, labels, size, datadir):
                 frame_path = f"{datadir}/{splittxt}_frame{i}_{j}.png"
                 im.save(frame_path)
     else:
+        # define an exclusion box around motor
         motor_xycoords = (all_labels[4],all_labels[5])
         exclusion_box_start = (motor_xycoords[0] - 30, motor_xycoords[1] - 30)
         exclusion_box_end = (motor_xycoords[0] + 30, motor_xycoords[1] + 30)
