@@ -1,5 +1,10 @@
 import os
+'''
+This script is designed to be run inside any of the 4 directories on the supercomputer to check for duplicates with
+the CZI database. You have to go in a few levels for it to search correctly; the supercomputer is weird like that.
 
+Author: Eben Lonsdale, 10 April 2024
+'''
 
 def find_duplicates(directory):
     subdirectories = {}
@@ -17,7 +22,7 @@ def find_duplicates(directory):
     return duplicates
 
 # Replace 'directory_path' with the path to your main directory
-directory_path = '/path/to/main/directory'
+directory_path = '/home/ejl62/fsl_groups/grp_tomo_db1_d1/compute/TomoDB1_d1/FlagellarMotor_P1' # change for each directory
 duplicates = find_duplicates(directory_path)
 
 if duplicates:
