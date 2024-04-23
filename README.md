@@ -22,18 +22,7 @@
       * If it is denied: ->let us know in the ImageAI channel on Zulip. Give the reasoning why.
       * If it is approved: ->You are ready to proceed and access the Supercomputer!
     * Download Google Authenticator
-<<<<<<< HEAD
     * Return to https://rc.byu.edu and login. Set up two factor authentication using the QR code on the website.
-=======
-    * Return to https://rc.byu.edu and click 'Log In' at the top of the page and log in with your username and password. Set up two factor authentication using Google Authenticator and the QR code on the website.
->>>>>>> f13e1b3 (Updated two factor authentication instructions for supercomputer)
-    * If using Mac (GOOD JOB!) open terminal and type  "ssh *username*@ssh.rc.byu.edu" replacing *username* with yours
-    * You will then be prompted to enter your password you made on the rc.byu website followed by your 6-digit google authenticator code
-    * You will not immediately have access to the group's shared files and directories.
-    * Begin following the tutorials under the documentation section of the rc website. (Most of the YT vids are out of date but there are a few seminars from 2020 you can look at. Mainly just focus on '**Linux tutorial**'. This will teach you how to navigate the supercomputer.)
-    * Once you feel comfortable with the LinuxOS let us know and we will give you access to our shared group directory.
-    * Linux Cheat Sheet: https://docs.google.com/document/d/1rwuWKhjxmHehSVlJTS4vgwJxQZZZxg5z0vF_GyNLXE0/edit?usp=sharing
-4.  Get Julia installed
     * Go to https://julialang.org/downloads/
     * If using Mac, be sure to check which processor/chip your computer has. (APPLE LOGO, About this Mac)
         * If it says "Chip" anywhere, be sure to download the Apple Silicon .dmg file.
