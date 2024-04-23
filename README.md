@@ -46,50 +46,6 @@
     * Install the Julia extension
       * Open VScode and press command[⌘], shift[⇧], [X]
       * Search Julia and install the 'Julia Language Support' extension
-    * You are now ready to use Julia in VScode!
-6.   Install IMOD
-    * Go to https://bio3d.colorado.edu/imod/download.html
-    * Select Linux, Mac, or Windows and then install the IMOD package using the one-click installer link or the command-line link
-    * Once installed, use the command imodinfo to verify that you have downloaded it correctly      
+    * You are now ready to use Julia in VScode!   
 
-7.  Do Chapters 1, 2, and 9 of [Giordano](https://drive.google.com/drive/folders/1fRZ3O7edJSBFz9f5hYGVnzf6_JLeRBmc?usp=sharing) and pass it off
-8.  Install Anaconda and Python
-
-## Getting started with MNIST
-Congratulations! You have finished the warmup and setup and are now ready to get started workin with AI. We will start with the MNIST data set.
-1. Setting up PyTorch
-   * Tutorial video: https://www.youtube.com/watch?v=v43SlgBcZ5Y&t=773s
-   * In your terminal write: `conda create --name pytorch2`
-   * Go to https://pytorch.org/get-started/locally/ and install PyTorch according to your OS, copy and paste the command it gives you
-   * Back in your terminal write `conda activate torch`
-   * 
-
-## Videos
-Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
-Here is a 17 minute [Video](https://www.youtube.com/watch?v=DGojI9xcCfg) by Grant Sanderson in the MIT series. Working with images in Julia.<br>
-TODO(add more videos)
-(idea) NN from 3B1B (four videos)
-
-
-# ImageAI (Old)
-This repo serves as a guide for the BYU Image Segmentation group. Below, papers and videos are listed to introduce the topic of Tomogram AI.
-
-## Papers
-[Isonet](https://www.biorxiv.org/content/10.1101/2021.07.17.452128v1.full) is a deep learning-based software package that iteratively reconstructs the missing-wedge information and increases signal-to-noise ratio, using the knowledge learned from raw tomograms. The software is stored [here](https://github.com/IsoNet-cryoET/IsoNet) on GitHub.
-
-[This paper](https://www.sciencedirect.com/science/article/pii/S096921261930005X?via%3Dihub) discusses a framework for discovoring new structures in tomograms.
-
-## Books
-[Here](https://www.cellstructureatlas.org/) is an online textbook by Grant Jenson on microbial cells guided by cutting-edge 3D electron microscopy.
-
-## Videos
-Here is a quick [Video](https://www.youtube.com/watch?v=yR7k19YBqiw) that introduces the idea of clustering and image segmentation. 8 minutes.<br>
-Here is a 17 minute [Video](https://www.youtube.com/watch?v=DGojI9xcCfg) by Grant Sanderson in the MIT series. Working with images in Julia.<br>
-TODO(add more videos)
-
-## Examples
-<<<<<<< HEAD
-There is not much currently in this [directory](https://github.com/byu-biophysics/ImageSegmentation/tree/main/examples), however it serves as a location for various "play" scripts for learning fundametals of Tomogram AI. 
-=======
-There is not much currently in this [directory](https://github.com/byu-biophysics/ImageSegmentation/tree/main/examples), however it serves as a location for various "play" scripts for learning fundametals of Tomogram AI. 
->>>>>>> f13e1b3 (Updated two factor authentication instructions for supercomputer)
+6.  Do Chapters 1, 2, and 9 of [Giordano](https://drive.google.com/drive/folders/1fRZ3O7edJSBFz9f5hYGVnzf6_JLeRBmc?usp=sharing) and pass it off
