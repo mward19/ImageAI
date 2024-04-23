@@ -1,7 +1,3 @@
-## TODO:
-- FSL Groups (Braxton is an group manager so he can add as well as Gus)
-- Quartz(along with X11 forwarding: denoted by -X option for ssh) for using GUI on Super Computer
-- Access super computer via vscode (consider .ssh/config option for setting up alias and multiplexing i.e. ssh sc)
 # ImageAI Walkthru
 
 1. Github: Understand the full [quickstart section](https://docs.github.com/en/get-started)
