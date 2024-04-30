@@ -4,8 +4,8 @@ from tkinter import Tk, Label, Button, PhotoImage
 from PIL import Image, ImageTk
 
 # Path to the directories
-source_directory = '../allimgs'
-destination_directory = 'my_selected_images'
+source_directory = '~/Research/biophysics/all_imgs_neg'
+destination_directory = '~/Research/biophysics/my_negative_images/'
 
 # Make sure the destination directory exists
 if not os.path.exists(destination_directory):
