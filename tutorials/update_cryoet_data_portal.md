@@ -77,7 +77,7 @@ Once we felt like they have the majority of the metadata for the overlapped tomo
 
 
 ## IMPORTANT! List of currently submitted batches
-[Here]() is a shared drive where we can keep track of what has been submitted.
+[Here](https://drive.google.com/drive/folders/1U2ez5aPo6cr30HJ-m5IVmFqwzUnCXwex?usp=sharing) is a shared drive where we can keep track of what has been submitted.
 
 ### Quick list
 - Drive 3 MS ring. 
