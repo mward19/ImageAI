@@ -1,9 +1,9 @@
-# Tutorial for using IMOD on the supercomputer
+# Tutorial for using IMOD GUI on the supercomputer
 
 ### Step 1:
 Install XQuartz (for mac users) using [this link](https://www.xquartz.org/)
 
-### Step 2:
+### Step 2: (only step you need to do to use IMOD command via command line)
  - log into the supercomputer
  - edit your .bashrc script by adding these two lines
 ```bash
