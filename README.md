@@ -24,7 +24,7 @@
         * If it says "Chip" anywhere, be sure to download the Apple Silicon .dmg file.
         * If it says "Processor" anwhere, be sure to download the Intel .dmg .
     * Follow the instructions to get Julia up and running!
-5.  Install VScode
+4.  Install VScode
     * VScode is great, however, any ide or text editor will work. If you are feeling brave try [vim](https://www.vim.org/)
     * Go to https://code.visualstudio.com/download
     * Be sure to follow the same rules about the chip/processor
@@ -32,9 +32,9 @@
       * Open VScode and press command[⌘], shift[⇧], [X]
       * Search Julia and install the 'Julia Language Support' extension
     * You are now ready to use Julia in VScode!
-6.  Set up SSH Multiplexing
+5.  Set up SSH Multiplexing
     * Setting up ssh multiplexing can make your life significantly easier. This can allow you to ssh with your credentials once, and if the connection is still open, have subsequent ssh sessions run without having to authenticate again. In other words, you don't have to enter your password and verification code as often.
     * Go to https://rc.byu.edu/wiki/index.php?page=SSH+Multiplexing and follow the steps in the documentation.
-7.  Set up Python in the supercomputer
+6.  Set up Python in the supercomputer
     * Go to https://rc.byu.edu/wiki/?page=Python and follow the steps in the documentation. 
-8.  Do Chapters 1, 2, and 9 of [Giordano](https://drive.google.com/drive/folders/1fRZ3O7edJSBFz9f5hYGVnzf6_JLeRBmc?usp=sharing) and pass it off
+7.  Do Chapters 1, 2, and 9 of [Giordano](https://drive.google.com/drive/folders/1fRZ3O7edJSBFz9f5hYGVnzf6_JLeRBmc?usp=sharing) and pass it off
