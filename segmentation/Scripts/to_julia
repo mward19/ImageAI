@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Check if input path is provided
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <input_path>"
+    exit 1
+fi
+
+# Get the directory of the script
+script_dir=$(dirname "$(realpath "$0")")
+
+# Call the Julia script
+julia "$script_dir/mha_to_jld.jl" "$1"
+
