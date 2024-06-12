@@ -61,3 +61,13 @@ Our goal is to segment some subset of the tomograms stored on the CryoET Data Po
  - In the folder in which the original .mrc file came from, call
  `to_julia SegData/[mysegmentation.mha]` to convert the .mha segmentation data to a Julia
  array, which is saved in a `.jld2` (JLD2) file. 
+
+
+# Using the Mac
+ - Sign in with the "Matthew Ward" account.
+ 
+ - The tomogram segmentation stuff is in `~/Documents/Segmentation/tomogram_seg`.
+
+ - Download new tomograms to `raw_tomograms` (for now. this is not strictly necessary).
+   Rename and organize them as described in the Organizing Files for Segmentation section of
+   this document.
