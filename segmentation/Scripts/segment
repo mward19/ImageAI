@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Check if the correct number of arguments are provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 target_file"
+    exit 1
+fi
+
+# Assign arguments to variables
+target_file="$1"
+output_dir="SegData"
+
+# Get the directory of the script
+script_dir=$(dirname "$(realpath "$0")")
+
+# Run the conversion script
+echo "Running mrc_to_mha.py to convert $target_file..."
+python "$script_dir/mrc_to_mha.py" "$target_file"
+
+# Check if the conversion was successful
+if [ $? -ne 0 ]; then
+    echo "Error: mrc_to_mha.py failed to convert $target_file."
+    exit 1
+fi
+
+# Determine the output file path
+output_file="$output_dir/$(basename "${target_file%.*}.mha")"
+
+# Open the output file with itksnap
+echo "Opening $output_file with itksnap..."
+itksnap "$output_file"
+
+# Check if itksnap was successful
+if [ $? -ne 0 ]; then
+    echo "Error: itksnap failed to open $output_file."
+    exit 1
+fi
+
+echo "Process completed successfully."
+
