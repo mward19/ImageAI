@@ -35,7 +35,7 @@ Our goal is to segment some subset of the tomograms stored on the CryoET Data Po
 
  - Interrupt the now completed `segment` script with **Ctrl+C**. In the terminal, the segmenatation and labeling you have just created are now saved in the SegData folder. 
 
- - Upload new segmentations to the supercomputer using `scp`. On the supercomputer, the segmenations are currently stored in `~/fsl_groups/grp_tomo_db1_d1/compute/Segmentation`. For example, to reupload the entire `SegData` folder to the supercomputer, in the local folder in which `SegData` is located, call `scp SegData [BYU ID]@ssh.rc.byu.edu:~/fsl_groups/grp_tomo_db1_d1/compute/Segmentation`.
+ - Upload new segmentations to the supercomputer using `scp`. On the supercomputer, the segmenations are currently stored in `~/fsl_groups/grp_tomo_db1_d1/compute/Segmentation`. For example, to reupload the entire `SegData` folder to the supercomputer, in the local folder in which `SegData` is located, call `scp -r SegData [BYU ID]@ssh.rc.byu.edu:~/fsl_groups/grp_tomo_db1_d1/compute/Segmentation`.
 
 # Extra Scripts
  - In the folder in which the original .mrc file came from, call `to_julia SegData/[mysegmentation.mha]` to convert the .mha segmentation data to a Julia array, which is saved in a `.jld2` (JLD2) file. 
