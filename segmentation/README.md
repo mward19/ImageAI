@@ -1,5 +1,5 @@
 # About
-`segmentation` contains scripts and information about segmenting tomograms. Tomograms from the CryoET Data Portal are generally saved with the `.mrc` file format.v This file format is not compatible with ITK-SNAP, an open source 3D segmenation program. Many of the scripts in `segmentation/scripts` simply convert between file formats.
+`segmentation` contains scripts and information about segmenting tomograms. Tomograms from the CryoET Data Portal are generally saved with the `.mrc` file format. This file format is not compatible with ITK-SNAP, an open source 3D segmenation program. Many of the scripts in `segmentation/scripts` simply convert between file formats.
 
 # Segmentation Goals
 Our goal is to segment some subset of the tomograms stored on the CryoET Data Portal.
@@ -18,7 +18,7 @@ Our goal is to segment some subset of the tomograms stored on the CryoET Data Po
      - Be sure that ITK-SNAP is installed and callable from the terminal with the command `itksnap`. In Linux this seems to require editing $PATH to include the `itksnap` executable included in the downloaded directory.
      - Be sure the current python environment has the necessary packages installed (like `mrcfile`). This is easy with a Python virtual environment.
 
- - Activate the python environment in which the necessary packages are installed. On the Mac, where setup is complete, call `source py_research/bin/activate`.
+ - Activate the python environment in which the necessary packages are installed. See the section "Using the Mac" in this document to do this on the Mac, where setup is already complete.
 
  - Download and/or locate a tomogram to segment. Move and rename the file based on the guidelines in the "Organizing Files for Segmentation" section of this document.
 
@@ -57,5 +57,7 @@ Our goal is to segment some subset of the tomograms stored on the CryoET Data Po
  - Sign in with the "Matthew Ward" account.
  
  - The tomogram segmentation stuff is in `~/Documents/Segmentation/tomogram_seg`.
+
+ - To activate the Python virtual environment, navigate to `~/Documents/Segmentation/tomogram_seg` and call `source py_research/bin/activate`.
 
  - Download new tomograms to `raw_tomograms` (for now. this is not strictly necessary). Rename and organize them as described in the Organizing Files for Segmentation section of this document.
