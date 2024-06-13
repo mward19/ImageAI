@@ -1,4 +1,4 @@
 # ignore OS generated files
 .DS_Store
 .vscode/
-
+__pycache__/
