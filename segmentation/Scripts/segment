@@ -1,19 +1,33 @@
 #!/bin/bash
 
-# Check if the correct number of arguments are provided
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 target_file"
+# initialize variables
+dataset_id=""
+run_id=""
+output_dir="SegData"
+
+# Parse command line arguments
+while getopts ":d:r:" opt; do
+  case $opt in
+    d) dataset_id=$OPTARG ;;
+    r) run_id=$OPTARG ;;
+    \?) echo "Invalid option: -$OPTARG" >&2; exit 1 ;;
+    :) echo "Option -$OPTARG requires an argument." >&2; exit 1 ;;
+  esac
+done
+
+# Check if both -d (dataset_id) and -r (run_id) were provided
+if [ -z "$dataset_id" ] || [ -z "$run_id" ]; then
+    echo "Usage: $0 -d <dataset_id> -r <run_id>"
     exit 1
 fi
 
-# Assign arguments to variables
-target_file="$1"
-output_dir="SegData"
-
 # Get the directory of the script
 script_dir=$(dirname "$(realpath "$0")")
+# download the tomogram
+echo "Downloading tomogram..."
+target_file=$(python "$script_dir/auto_tomo_download.py" "$dataset_id" "$run_id")
 
-# Run the conversion script
+# Run the conversion script )
 echo "Running mrc_to_mha.py to convert $target_file..."
 python "$script_dir/mrc_to_mha.py" "$target_file"
 
@@ -37,4 +51,3 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Process completed successfully."
-
