@@ -16,11 +16,11 @@ If a file type is not provided, it will automatically search for '.mod' files. I
 even if you are providing the file name.
 Show this message with -h.'''
 
-# check for depencies
+# check for non-standard depency
 try:
     from cryoet_data_portal import Client, Dataset
 except ImportError:
-    print("Missing dependency: cryoet_data_portal. Please install it before running this script.")
+    print("Missing dependency: cryoet_data_portal. Please install it using\n pip install -U cryoet-data-portal\n before running this script.")
     sys.exit(1)
 # import necessary libraries
 from cryoet_data_portal import Client, Dataset
