@@ -15,19 +15,18 @@ This script can find the following: specific files if run with the -f flag, for 
 If a file type is not provided, it will automatically search for '.mod' files. If you want to search for something other than '.mod' files, you must provide the file type,
 even if you are providing the file name.
 Show this message with -h.'''
-
+# import necessary libraries
+import os
+from collections import defaultdict
+import sys
+import shutil
 # check for non-standard depency
 try:
     from cryoet_data_portal import Client, Dataset
 except ImportError:
     print("Missing dependency: cryoet_data_portal. Please install it using\n pip install -U cryoet-data-portal\n before running this script.")
     sys.exit(1)
-# import necessary libraries
-from cryoet_data_portal import Client, Dataset
-import os
-from collections import defaultdict
-import sys
-import shutil
+
 
 # functions to get run names from sc and czi
 def get_sc_runnames(search_dir):
