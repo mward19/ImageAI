@@ -12,7 +12,17 @@ output directory with the following naming convention: <CZI_run_name>_<CZI_run_i
 Usage:
 python czi_data_prep_pipeline.py -s <search_dir> -o <output_dir> [-f <target_file>] [-t <file_type>]
 This script can find the following: specific files if run with the -f flag, for example "MS.mod". It can also be used to search only for files of a certain type using the -t flag, for example ".mod" files.
-If a file type is not provided, it will automatically search for ".mod" files. Show this message with -h.'''
+If a file type is not provided, it will automatically search for '.mod' files. If you want to search for something other than '.mod' files, you must provide the file type,
+even if you are providing the file name.
+Show this message with -h.'''
+
+# check for depencies
+try:
+    from cryoet_data_portal import Client, Dataset
+except ImportError:
+    print("Missing dependency: cryoet_data_portal. Please install it before running this script.")
+    sys.exit(1)
+# import necessary libraries
 from cryoet_data_portal import Client, Dataset
 import os
 from collections import defaultdict
@@ -94,7 +104,7 @@ def find_mod_files_and_directories(matched_dirs,target_file,file_type):
     for directory in matched_dirs:
         for root, dirs, files in os.walk(directory):
             for file in files:
-                if file.endswith(file_type) and file == target_file:
+                if file.endswith(file_type) and (file == target_file or target_file is None):
                     target_file_dirs[file].add(root)
     return target_file_dirs
 
@@ -106,9 +116,9 @@ def copy_files_to_target_directories(target_file_dirs, output_dir,matched_dirs_i
     for file, directories in target_file_dirs.items():
         for dirpath in directories:
             czi_run_name, czi_dataset_id, czi_run_id = matched_dirs_info[dirpath]
-            new_file_name = f"{czi_run_name}_{czi_run_id}_{file}"
-            output_path = os.path.join(output_dir, czi_dataset_id)
-            os.makedirs(output_path, exist_ok=True)  # Fix 5: Ensure directory exists without error
+            new_file_name = f"{czi_run_name}_{czi_run_id}_{file}" # create new file name with run name, run ID, and target file
+            output_path = os.path.join(output_dir, str(czi_dataset_id))
+            os.makedirs(output_path, exist_ok=True) # make directory if it doesn't exist
             shutil.copy(os.path.join(dirpath, file), os.path.join(output_path, new_file_name))
             file_counter += 1
     print(f"Copied {file_counter} files to {output_dir}.")
@@ -123,14 +133,13 @@ def print_help():
 
 
 if __name__ == '__main__':
-    # check for at least 2 arguments
-    if len(sys.argv) < 3:
-        print("Usage: python czi_data_prep_pipeline.py -s <search_dir> -o <output_dir> [-f <target_file>] [-t <file_type>]")
-        sys.exit(1)
-
     # check for help flag
     if '-h' in sys.argv:
         print_help()
+    # check for at least 2 arguments
+    if len(sys.argv) < 3:
+        print("Usage: python czi_data_prep_pipeline.py -s <search_dir> -o <output_dir> [-f <target_file>] [-t <file_type>]\n For more information, use the -h flag.")
+        sys.exit(1)
     
     # input variables from command line using flags
     # -s: search directory
