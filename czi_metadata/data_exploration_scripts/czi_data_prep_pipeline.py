@@ -6,14 +6,12 @@ Dependencies: cryoet_data_portal, os, collections, sys, shutil
 
 Description:
 This script is meant to prepare annotation files from the supercomputer to be put into a depostion and uploaded to the CZI database. It takes in a search directory on the super computer,
-an output directory for the files, and optional flags for target files and file types. It then finds matching run names between the super computer and CZI datasets, and copies the files to the 
+an output directory for the files, and an annotation file to search for. It then finds matching run names between the super computer and CZI datasets, and copies the files to the 
 output directory with the following naming convention: <CZI_run_name>_<CZI_run_id>_<target_file>. The files are organized by dataset ID as a subdirectory in the output directory.
 
 Usage:
-python czi_data_prep_pipeline.py -s <search_dir> -o <output_dir> [-f <target_file>] [-t <file_type>]
-This script can find the following: specific files if run with the -f flag, for example "MS.mod". It can also be used to search only for files of a certain type using the -t flag, for example ".mod" files.
-If a file type is not provided, it will automatically search for '.mod' files. If you want to search for something other than '.mod' files, you must provide the file type,
-even if you are providing the file name.
+python czi_data_prep_pipeline.py -s <search_directory> -o <output_directory> -f <target_file>
+This script can find the specific files, for example "MS.mod".
 Show this message with -h.'''
 # import necessary libraries
 import os
@@ -24,7 +22,7 @@ import shutil
 try:
     from cryoet_data_portal import Client, Dataset
 except ImportError:
-    print("Missing dependency: cryoet_data_portal. Please install it using\n pip install -U cryoet-data-portal\n before running this script.")
+    print("Missing dependency: cryoet_data_portal. Please install it using\npip install -U cryoet-data-portal\nbefore running this script.")
     sys.exit(1)
 
 
@@ -97,13 +95,13 @@ def find_matching_directories(search_dir, matching_run_names,matching_run_info):
     return matched_dirs,matched_dirs_info
 
 # functions to find and copy files
-def find_mod_files_and_directories(matched_dirs,target_file,file_type):
+def find_mod_files_and_directories(matched_dirs,target_file):
     """Given a list of directories, find all target files within them and track directories."""
     target_file_dirs = defaultdict(set)
     for directory in matched_dirs:
         for root, dirs, files in os.walk(directory):
             for file in files:
-                if file.endswith(file_type) and (file == target_file or target_file is None):
+                if file == target_file:
                     target_file_dirs[file].add(root)
     return target_file_dirs
 
@@ -124,7 +122,7 @@ def copy_files_to_target_directories(target_file_dirs, output_dir,matched_dirs_i
 
 def print_help():
     """Prints help message and asks user if they want to see the full docstring."""
-    print("Usage: python czi_data_prep_pipeline.py -s <search_dir> -o <output_dir> [-f <target_file>] [-t <file_type>]")
+    print("Usage: python czi_data_prep_pipeline.py -s <search_directory> -o <output_directory> -f <target_file>")
     response = input("Would you like to read the full documentation? (y/n): ")
     if response.lower() == 'y':
         print(__doc__)
@@ -135,22 +133,19 @@ if __name__ == '__main__':
     # check for help flag
     if '-h' in sys.argv:
         print_help()
-    # check for at least 2 arguments
-    if len(sys.argv) < 3:
-        print("Usage: python czi_data_prep_pipeline.py -s <search_dir> -o <output_dir> [-f <target_file>] [-t <file_type>]\n For more information, use the -h flag.")
+    # check argument length
+    if len(sys.argv) != 7:
+        print("Usage: python czi_data_prep_pipeline.py -s <search_directory> -o <output_directory> -f <target_file>\n For more information, use the -h flag.")
         sys.exit(1)
     
     # input variables from command line using flags
     # -s: search directory
     # -o: output directory
-    # -f: target file (optional)
-    # -t: file type (optional)
+    # -f: target file
     # -h: help
     search_dir = sys.argv[sys.argv.index('-s')+1]
     output_dir = sys.argv[sys.argv.index('-o')+1]
-    target_file = sys.argv[sys.argv.index('-f')+1] if '-f' in sys.argv else None
-    file_type = sys.argv[sys.argv.index('-t')+1] if '-t' in sys.argv else '.mod'
-    
+    target_file = sys.argv[sys.argv.index('-f')+1] 
 
     # run the script
     # get run names from sc and czi
@@ -160,5 +155,5 @@ if __name__ == '__main__':
     matching_run_names, matching_run_info = find_matching_runs(sc_run_names, czi_run_names, czi_ids)
     matched_dirs, matched_dirs_info = find_matching_directories(search_dir, matching_run_names, matching_run_info)
     # find and copy files
-    target_file_dirs = find_mod_files_and_directories(matched_dirs, target_file, file_type)
+    target_file_dirs = find_mod_files_and_directories(matched_dirs, target_file)
     copy_files_to_target_directories(target_file_dirs, output_dir, matched_dirs_info)
