@@ -12,7 +12,10 @@ output directory with the following naming convention: <CZI_run_name>_<CZI_run_i
 Usage:
 python czi_data_prep_pipeline.py -s <search_directory> -o <output_directory> -f <target_file>
 This script can find the specific files, for example "MS.mod".
-Show this message with -h.'''
+Show this message with -h.
+
+TODO:
+Right now the CZI look up slows things down a lot. Find a way to make it faster.'''
 # import necessary libraries
 import os
 from collections import defaultdict
