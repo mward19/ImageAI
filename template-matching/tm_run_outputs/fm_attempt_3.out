@@ -1,0 +1,26 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"miniconda3/latest"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "miniconda3/latest"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+/var/spool/slurmd/job65993021/slurm_script: line 40: activate: No such file or directory
+Traceback (most recent call last):
+  File "/home/ejl62/pyTME/scripts/match_template.py", line 20, in <module>
+    from tme import Density, __version__
+ModuleNotFoundError: No module named 'tme'
+/var/spool/slurmd/job65993021/slurm_script: line 46: --target: command not found
+/var/spool/slurmd/job65993021/slurm_script: line 48: --template: command not found
+/var/spool/slurmd/job65993021/slurm_script: line 51: --invert_target_contrast: command not found
+/var/spool/slurmd/job65993021/slurm_script: line 53: --use_gpu: command not found
+/var/spool/slurmd/job65993021/slurm_script: line 54: -n: command not found
+/var/spool/slurmd/job65993021/slurm_script: line 56: -a: command not found
+/var/spool/slurmd/job65993021/slurm_script: line 58: --memory_scaling: command not found
+/var/spool/slurmd/job65993021/slurm_script: line 61: --no_fourier_padding: command not found
+/var/spool/slurmd/job65993021/slurm_script: line 62: -o: command not found
