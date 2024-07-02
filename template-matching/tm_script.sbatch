@@ -34,7 +34,7 @@ export OMP_NUM_THREADS=$SLURM_CPUS_ON_NODE
 
   
 
-module load miniconda3/latest
+module load miniconda3/24.3.0-poykqmt
 module load cuda/12.4.1-pw6cogp
 
 source activate pytme
