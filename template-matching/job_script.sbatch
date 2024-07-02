@@ -42,7 +42,7 @@ source activate pytme
   
 
 python /home/ejl62/pyTME/scripts/match_template.py \
---target /home/ejl62/fsl_groups/grp_tomo_db1_d1/nobackup/archive/TomoDB1_d1/FlagellarMotor_P1/Caulobacter crescentus/flag_3_full.rec \
+--target /home/ejl62/fsl_groups/grp_tomo_db1_d1/nobackup/archive/TomoDB1_d1/FlagellarMotor_P1/Caulobacter\ crescentus/flag_3_full.rec \
 --template /home/ejl62/Documents/template_matching/fm_caulo_tm/flagellum_AvgVol_4P120.mrc \
 --invert_target_contrast \
 --use_gpu \
