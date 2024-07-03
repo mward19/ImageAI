@@ -58,6 +58,6 @@ Our goal is to segment some subset of the tomograms stored on the CryoET Data Po
  
  - The tomogram segmentation stuff is in `~/Documents/Segmentation/tomogram_seg`.
 
- - To activate the Python virtual environment, navigate to `~/Documents/Segmentation/tomogram_seg` and call `source py_research/bin/activate`.
+ - To activate the Python virtual environment, navigate to `~/Documents/Segmentation/tomogram_seg/segmentation` and call `source py_research/bin/activate`.
 
  - Download new tomograms to `raw_tomograms` (for now. this is not strictly necessary). Rename and organize them as described in the Organizing Files for Segmentation section of this document.
