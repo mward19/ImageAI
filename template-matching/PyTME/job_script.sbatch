@@ -52,4 +52,4 @@ python /home/ejl62/pyTME/scripts/match_template.py \
 -a 5 \
 --memory_scaling 0.96 \
 --no_fourier_padding \
--o /home/ejl62/nobackup/archive/template_matching
+-o /home/ejl62/ImageAI/template-matching/PyTME/tm_run_outputs/caulobacter_fm_1.pickle
