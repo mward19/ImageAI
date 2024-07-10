@@ -11,10 +11,6 @@
 
 #SBATCH --gpus=4
 
-#SBATCH --mail-user=ejl62@byu.edu # email address
-
-#SBATCH --mail-type=END
-
 #SBATCH --export=NONE
 
 #SBATCH --mem 10G
@@ -42,10 +38,10 @@ pytom_create_template.py \
  --center
 
 pytom_create_mask.py \
- -b 300 \
+ -b 95 \
  -o /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/templates_masks/caulobacter_fm_mask.mrc \
  --voxel-size 14.08 \
- --radius 110 \
+ --radius 90 \
  --sigma 1
   
 pytom_match_template.py \
@@ -54,7 +50,7 @@ pytom_match_template.py \
  -v /home/ejl62/fsl_groups/grp_tomo_db1_d1/nobackup/archive/TomoDB1_d1/FlagellarMotor_P1/Caulobacter\ crescentus/flag_3_full.rec \
  -d /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/results \
  --voxel-size-angstrom 14.08 \
- --particle-diameter 300 \
+ --particle-diameter 80 \
  --tilt-angles -55 55 \
  --random-phase \
  -g 0 1 2 3
