@@ -3,7 +3,7 @@
 
 
 
-#SBATCH --time=2:00:00 # walltime
+#SBATCH --time=00:05:00 # walltime
 
 #SBATCH --ntasks=1 # number of processor cores (i.e. tasks)
 
@@ -13,7 +13,7 @@
 
 #SBATCH --export=NONE
 
-#SBATCH --mem 10G
+#SBATCH --mem 2G
 
   
 
@@ -31,26 +31,28 @@ module load cuda/12.4.1-pw6cogp
 source activate pytom
 
 pytom_create_template.py \
- -i /home/ejl62/fsl_groups/fslg_imagseg/nobackup/archive/eben/template_matching/fm_caulo_tm/flagellum_AvgVol_4P120.mrc \
+ -i /home/ejl62/template_matching_shared/masks/flagellum_AvgVol_4P120.mrc \
  -o /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/templates_masks/caulobacter_fm_template.mrc \
  --output-voxel 14.08 \
- --invert \
- --center
+ --box-size 101 \
+ --center \
+ --log info
+
 
 pytom_create_mask.py \
- -b 95 \
+ -b 100 \
  -o /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/templates_masks/caulobacter_fm_mask.mrc \
  --voxel-size 14.08 \
- --radius 90 \
+ --radius 45 \
  --sigma 1
   
-pytom_match_template.py \
- -t /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/templates_masks/caulobacter_fm_template.mrc \
- -m /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/templates_masks/caulobacter_fm_mask.mrc \
- -v /home/ejl62/fsl_groups/grp_tomo_db1_d1/nobackup/archive/TomoDB1_d1/FlagellarMotor_P1/Caulobacter\ crescentus/flag_3_full.rec \
- -d /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/results \
- --voxel-size-angstrom 14.08 \
- --particle-diameter 80 \
- --tilt-angles -55 55 \
- --random-phase \
- -g 0 1 2 3
+# pytom_match_template.py \
+#  -t /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/templates_masks/caulobacter_fm_template.mrc \
+#  -m /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/templates_masks/caulobacter_fm_mask.mrc \
+#  -v /home/ejl62/fsl_groups/grp_tomo_db1_d1/nobackup/archive/TomoDB1_d1/FlagellarMotor_P1/Caulobacter\ crescentus/flag_3_full.rec \
+#  -d /home/ejl62/template_matching_shared/pytom/flagellar_motor_tm/results \
+#  --voxel-size-angstrom 14.08 \
+#  --particle-diameter 80 \
+#  --tilt-angles -55 55 \
+#  --random-phase \
+#  -g 0 1 2 3
