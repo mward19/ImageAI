@@ -1,0 +1,49 @@
+WARNING:root:Voxel size annotation in MRC is slightly different between dimensions, namely (13.328002, 13.328, 13.328002). It might be a tiny numerical inaccuracy, but please ensure this is not problematic.
+INFO:root:Convoluting volume with filter and then downsampling.
+INFO:root:Will generate an angle list with a maximum increment of 18.98175471868704
+INFO:root:Using an angle difference of 14.6581 for Z1 and X
+INFO:root:Using an angle difference of 18.9474 for Z2
+WARNING: Provided voxel size does not match voxel size annotated in tomogram/template mrc.
+Process Process-2:
+Traceback (most recent call last):
+  File "/home/ejl62/.conda/envs/pytom/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/ejl62/.conda/envs/pytom/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ejl62/.conda/envs/pytom/lib/python3.12/site-packages/pytom_tm/parallel.py", line 51, in gpu_runner
+    result_queue.put_nowait(job.start_job(gpu_id, return_volumes=False))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ejl62/.conda/envs/pytom/lib/python3.12/site-packages/pytom_tm/tmjob.py", line 834, in start_job
+    tm = TemplateMatchingGPU(
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ejl62/.conda/envs/pytom/lib/python3.12/site-packages/pytom_tm/matching.py", line 191, in __init__
+    self.plan = TemplateMatchingPlan(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ejl62/.conda/envs/pytom/lib/python3.12/site-packages/pytom_tm/matching.py", line 87, in __init__
+    self.noise_scores = cp.ones(volume_shape, dtype=cp.float32) * -1000
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+  File "cupy/_core/core.pyx", line 1289, in cupy._core.core._ndarray_base.__mul__
+  File "cupy/_core/core.pyx", line 1697, in cupy._core.core._ndarray_base.__array_ufunc__
+  File "cupy/_core/_kernel.pyx", line 1350, in cupy._core._kernel.ufunc.__call__
+  File "cupy/_core/_kernel.pyx", line 645, in cupy._core._kernel._get_out_args_from_optionals
+  File "cupy/_core/core.pyx", line 2811, in cupy._core.core._ndarray_init
+  File "cupy/_core/core.pyx", line 241, in cupy._core.core._ndarray_base._init_fast
+  File "cupy/cuda/memory.pyx", line 738, in cupy.cuda.memory.alloc
+  File "cupy/cuda/memory.pyx", line 1424, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1445, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1116, in cupy.cuda.memory.SingleDeviceMemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1137, in cupy.cuda.memory.SingleDeviceMemoryPool._malloc
+  File "cupy/cuda/memory.pyx", line 1382, in cupy.cuda.memory.SingleDeviceMemoryPool._try_malloc
+  File "cupy/cuda/memory.pyx", line 1385, in cupy.cuda.memory.SingleDeviceMemoryPool._try_malloc
+cupy.cuda.memory.OutOfMemoryError: Out of memory allocating 1,474,560,000 bytes (allocated so far: 16,253,651,456 bytes).
+Traceback (most recent call last):
+  File "/home/ejl62/.conda/envs/pytom/bin/pytom_match_template.py", line 8, in <module>
+    sys.exit(match_template())
+             ^^^^^^^^^^^^^^^^
+  File "/home/ejl62/.conda/envs/pytom/lib/python3.12/site-packages/pytom_tm/entry_points.py", line 883, in match_template
+    score_volume, angle_volume = run_job_parallel(
+                                 ^^^^^^^^^^^^^^^^^
+  File "/home/ejl62/.conda/envs/pytom/lib/python3.12/site-packages/pytom_tm/parallel.py", line 157, in run_job_parallel
+    raise RuntimeError(
+RuntimeError: One or more of the processes stopped unexpectedly.
+slurmstepd: error: Detected 1 oom_kill event in StepId=66069369.batch. Some of the step tasks have been OOM Killed.
