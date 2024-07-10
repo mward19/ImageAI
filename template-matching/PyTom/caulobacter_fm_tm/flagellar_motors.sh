@@ -5,7 +5,7 @@
 #SBATCH --nodes=1   # number of nodes
 #SBATCH --gpus=2
 #SBATCH -C 'kepler'   # features syntax (use quotes): -C 'a&b&c&d'
-#SBATCH --mem=20G   # memory per CPU core
+#SBATCH --mem 20G
 #SBATCH -J "fm_tm_01"   # job name
 
 
