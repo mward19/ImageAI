@@ -32,7 +32,7 @@ Then we threshold the gradient image to extract edges without having to run anot
 <sub>I have implemented a kind of "memoization" (not to be confused with memorization) to make the closest contour function more efficient. In addition, I have implemented some memoization for the gradients, if we decide that we want to calculate edges and gradients separately. That would be more like Fast Ray Features for Learning Irregular Shapes</sub>
 
 ### Canonical orientation
-In [Supervoxel-Based Segmentation of Mitochondria in EM Image Stacks With Learned Shape Features](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6044718), the authors describe "align\[ing\] the descriptor to a canonical orientation, making it rotation invariant" by "reorder\[ing\] the descriptor such that $\bf{n}_1$ and $\bf{n}_2$ align with an orientation estimate". In our case, the information in the lowest and highest slices (along what ITK-SNAP calls the axial axis) is information-poor.
+In [Supervoxel-Based Segmentation of Mitochondria in EM Image Stacks With Learned Shape Features](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6044718), the authors describe "align\[ing\] the descriptor to a canonical orientation, making it rotation invariant" by "reorder\[ing\] the descriptor such that $\mathbf{n}_1$ and $\mathbf{n}_2$ align with an orientation estimate". In our case, the information in the lowest and highest slices (along what ITK-SNAP calls the axial axis) is information-poor.
 
 Thus, to use the notation in the paper, instead of seeking "two orthogonal vectors $e_1$ and $e_2$ in the directions of maximal variance of the local shape" in all three dimensions, I propose restricting $e_1$ and $e_2$ to lie within the 2D slice.
 
@@ -41,12 +41,12 @@ In extension, while the paper seems to depict Ray features being calculated for 
 ### Dealing with the edges of the image
 Because most tomograms are not large enough to depict a bacterium in its entirety, it is to be expected that a ray shot toward the borders of the tomogram will likely not encounter any contour. I propose the following modifications (or clarifications?) to the behavior of the four ray features and the closest contour function at the edges of the tomogram.
 
-- Closest contour function $c(\bf{m}) = \bf{c}$
+- Closest contour function $c(\mathbf{m}) = \mathbf{c}$
   - If a ray does not encounter a contour before reaching the edge of the image, then the closest contour is the position of the spot where the ray encountered the edge of the image, but those dimensions that lie on the edge of the image are saved as $-\infty$ or $\infty$ instead of the usual pixel value.
 - Distance feature
-  - If the vector $\bf{c} = c(\bf{m})$ has some $\infty$ value in it, return $\infty$.
+  - If the vector $\mathbf{c} = c(\mathbf{m})$ has some $\infty$ value in it, return $\infty$.
 - All other Ray features (Distance difference feature, Orientation feature, Norm feature)
-  - If the vector $\bf{c} = c(\bf{m})$ has some $\infty$ value in it, return NaN (not a number).
+  - If the vector $\mathbf{c} = c(\mathbf{m})$ has some $\infty$ value in it, return NaN (not a number).
 
 # Papers
 1. [Supervoxel-Based Segmentation of Mitochondria in EM Image Stacks With Learned Shape Features](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6044718) is the primary inspiration for this work.
