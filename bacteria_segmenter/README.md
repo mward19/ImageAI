@@ -17,10 +17,13 @@ Our goal is to construct a model that can efficiently segment bacteria in cryo-E
 
 
 ## Notes on preprocessing
-- It would be good to make the parameters of the filter(s) depend on the histogram characteristics of the tomogram, or at least perform a grid search over the parameters
-- To evaluate the effectiveness of a filter configuration, we could use the Intersection over Union (IoU) of the one-pixel-wide edge in a manual segmentation and the edge resulting from an edge detector applied to the filtered image.
-- The guided filter might not be the best choice. We just need an edge-preserving filter that works in 3D and scales well to the hundreds of millions of voxels in a tomogram.
-- Collin is assigned to this task, at the moment
+It would be good to make the parameters of the filter(s) depend on the histogram characteristics of the tomogram, or at least perform a grid search over the parameters.
+
+To evaluate the effectiveness of a filter configuration, we could use the Intersection over Union (IoU) of the one-pixel-wide edge in a manual segmentation and the edge resulting from an edge detector applied to the filtered image.
+
+The guided filter might not be the best choice. We just need an edge-preserving filter that works in 3D and scales well to the hundreds of millions of voxels in a tomogram.
+
+Collin is assigned to this task, at the moment.
 
 ## Notes on supervoxel segmentation
 I'm not yet sure how many supervoxels will be the right number. Fortunately, if we use some kind of weak classifier or decision tree type algorithm, the number of supervoxels doesn't have to be constant (I think).
