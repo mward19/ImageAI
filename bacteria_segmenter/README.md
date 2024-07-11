@@ -28,6 +28,8 @@ Collin is assigned to this task, at the moment.
 ## Notes on supervoxel segmentation
 I'm not yet sure how many supervoxels will be the right number. Fortunately, if we use some kind of weak classifier or decision tree type algorithm, the number of supervoxels doesn't have to be constant (I think).
 
+Perhaps we could find ideal paramaters using a method akin to the evaluation described in Notes on preprocessing.
+
 ## Notes on Ray features
 ### On efficiency
 In [Fast Ray Features for Learning Irregular Shapes](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6044718), an algorithm is proposed to efficiently precalculate the Ray features. I don't think it will apply to our situation&mdash;we only need to calculate features for a small subset of the voxels in each supervoxel. I propose the following (somewhat naive) approach:
