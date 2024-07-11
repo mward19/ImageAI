@@ -28,7 +28,7 @@ Collin is assigned to this task, at the moment.
 ## Notes on supervoxel segmentation
 I'm not yet sure how many supervoxels will be the right number. Fortunately, if we use some kind of weak classifier or decision tree type algorithm, the number of supervoxels doesn't have to be constant (I think).
 
-Perhaps we could find ideal paramaters using a method akin to the evaluation described in Notes on preprocessing.
+Perhaps we could find ideal parameters using a method akin to the evaluation described in Notes on preprocessing.
 
 ## Notes on Ray features
 ### On efficiency
