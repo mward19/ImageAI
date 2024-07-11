@@ -1,8 +1,8 @@
 # Goal
-Our goal is to construct a model that can segment bacteria in cryo-ET tomograms. This does not include structures within the bacteria&mdash;only the bacteria as a whole (the outer membrane, periplasm, cytoplasm, etc. all together).
+Our goal is to construct a model that can efficiently segment bacteria in cryo-ET tomograms. This does not include structures within the bacteria&mdash;only the bacteria as a whole (the outer membrane, periplasm, cytoplasm, etc. all together).
 
 # Plan
-- As a preprocessing step, apply a guided filter (or perhaps two) to the tomogram (using the tomogram as both the guide and the input to preserve edges) to minimize noise and emphasize the outer membrane
+- As a preprocessing step, apply a guided filter (or perhaps two, if it's cheap enough) to the tomogram (using the tomogram as both the guide and the input to preserve edges) to minimize noise and emphasize the outer membrane
   - <sub>It would be good to make the parameters of the filter(s) depend on the histogram characteristics of the tomogram, or at least perform a grid search over the parameters</sub>
   - <sub>To evaluate the effectiveness of a filter configuration, we could use the Intersection over Union (IoU) of the one-pixel-wide edge in a manual segmentation and the edge resulting from an edge detector applied to the filtered image.</sub>
   - <sub>The guided filter might not be the best choice. We just need an edge-preserving filter that works in 3D and scales well to the hundreds of millions of voxels in a tomogram</sub>
