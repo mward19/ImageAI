@@ -2,7 +2,11 @@
 Our goal is to construct a model that can efficiently segment bacteria in cryo-ET tomograms. This does not include structures within the bacteria&mdash;only the bacteria as a whole (the outer membrane, periplasm, cytoplasm, etc. all together).
 
 # Plan
-- As a preprocessing step, apply a guided filter (or perhaps two, if it's cheap enough) to the tomogram (using the tomogram as both the guide and the input to preserve edges) to minimize noise and emphasize the outer membrane
+- Downsample substantially to reduce the amount of data.
+  
+- Throw out slices at the top and bottom of the image stack that are "too" affected by the missing wedge problem (we will have to define this more rigorously).
+
+- Apply a guided filter (or perhaps two, if it's cheap enough) to the tomogram (using the tomogram as both the guide and the input to preserve edges) to minimize noise and emphasize the outer membrane
 
 - Perform an oversegmentation of the image using a supervoxel segmentation algorithm. SLIC will probably do the trick (hey, that rhymes!).
 
@@ -13,7 +17,10 @@ Our goal is to construct a model that can efficiently segment bacteria in cryo-E
   - Local intensity
   - Whatever else we can think of that's cheap and information-rich
 
-- Train a classifier algorithm or decision tree algorithm on the resulting data, using the manual segmentations we've been developing.
+- Let a model learn to segment with the features. There are many ways to do this, including:
+  - Construct a graph where superpixels are nodes and edges connect neighboring superpixels. [Supervoxel-Based Segmentation of Mitochondria in EM Image Stacks With Learned Shape Features](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6044718) describes a graph partitioning scheme that will probably work well for us.
+  - Train a classifier algorithm or decision tree algorithm on the resulting data, using the manual segmentations we've been developing.
+  
 
 
 ## Notes on preprocessing
