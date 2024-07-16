@@ -69,16 +69,17 @@ end
 """
 If the given point is outside the image bounds, represent the out of bounds dimensions as ∞ or -∞.
 """
-function loc_in_image(𝐈::Image, 𝐦::Vector)
+function loc_in_image(𝐈::Image, 𝐦::Vector, inf_edge=true)
     𝐦 = Float64.(𝐦)
     image_dims = size(𝐈.intensities)
     @assert length(image_dims) == length(𝐦)
 
     for i in eachindex(image_dims)
-        if floor(𝐦[i]) < 1
-            𝐦[i] = -Inf
-        elseif floor(𝐦[i]) > image_dims[i]
-            𝐦[i] = Inf
+        m_i = floor(𝐦[i])
+        if m_i < 1
+            𝐦[i] = inf_edge ? -Inf : 0
+        elseif m_i > image_dims[i]
+            𝐦[i] = inf_edge ? Inf : image_dims[i]
         end
     end
     return 𝐦
@@ -117,10 +118,10 @@ function get_grad_norm(𝐈::Image, 𝐦::Vector)
 end
 
 """ Closest contour point 𝐜. θ, γ in radians. """
-function closest_contour(𝐈::Image, 𝐦::Vector, θ, γ=nothing)
+function closest_contour(𝐈::Image, 𝐦::Vector, θ, γ=nothing, inf_edge=true)
     # TODO: test that this works
     if haskey(𝐈.cc_memo, (θ, γ))
-        return 𝐈.cc_memo[(θ, γ)]
+        return loc_in_image(𝐈, 𝐈.cc_memo[(θ, γ)], inf_edge)
     end
     # Otherwise find it
     step = ray_vector(θ, γ) # Already normalized
@@ -133,9 +134,9 @@ function closest_contour(𝐈::Image, 𝐦::Vector, θ, γ=nothing)
     end
     # If there is no contour before the edge of the image,
     # use `loc_in_image` to place ∞ values.
-    cc = loc_in_image(𝐈, 𝐦)
+    cc = loc_in_image(𝐈, 𝐦, inf_edge)
     # Save and return
-    𝐈.cc_memo[(θ, γ)] = cc
+    𝐈.cc_memo[(θ, γ)] = loc_in_image(𝐈, 𝐦, true)
     return cc
 end
 

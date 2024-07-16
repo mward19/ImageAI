@@ -7,7 +7,7 @@ using Infiltrator
 
 function display3d(orig_data, points=[]; rad=3, interval=1)
     data = RGB.(orig_data)
-    colors = [RGB(1,0,0), RGB(0,1,0), RGB(0, 0, 1)]
+    colors = [RGB(1,0,0), RGB(1,1,0), RGB(0,1,0), RGB(0,1,1), RGB(0, 0, 1), RGB(1, 0, 1)]
     Δ = rad
     for slice_index in axes(data, 1)
         if slice_index % interval != 0
@@ -15,10 +15,7 @@ function display3d(orig_data, points=[]; rad=3, interval=1)
         end
         for (p_index, p) in enumerate(points)
             if p[1] == slice_index
-                data[p[1]-Δ:p[1]+Δ, p[2]-Δ:p[2]+Δ, p[3]-Δ:p[3]+Δ] .= colors[p_index]
-                #data[p[1]-Δ:p[1]+Δ, p[2], p[3]] .= colors[p_index]
-                #data[p[1], p[2]-Δ:p[2]+Δ, p[3]] .= colors[p_index]
-                #data[p[1], p[2], p[3]-Δ:p[3]+Δ] .= colors[p_index]
+                data[p[1]-Δ:p[1]+Δ, p[2]-Δ:p[2]+Δ, p[3]-Δ:p[3]+Δ] .= colors[begin + (p_index-1) % length(colors)]
             end
         end
         display(data[slice_index, :, :])
