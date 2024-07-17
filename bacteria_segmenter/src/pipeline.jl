@@ -100,7 +100,7 @@ end
 
 
 function supervoxelate(tomogram; slico=false)
-    return Supervoxels.segment(tomogram.downsampled, 100, 1e-1; slico=slico)
+    return Supervoxels.segment(tomogram.filtered, 15, 1e-1; slico=slico)
 end
 
 function observation_points(tomogram, supervoxel_dict, points_per_super)
@@ -113,10 +113,43 @@ function observation_points(tomogram, supervoxel_dict, points_per_super)
     return all_points
 end
 
+relu(x) = x > 0 ? x : 0
+
+function mirror_index(array_axes, indices)
+    offsets = Vector{Int}()
+    for (axis, index) in zip(array_axes, indices)
+        left_offset  =   2 * relu(firstindex(axis) - index)
+        right_offset = - 2 * relu(index - lastindex(axis))
+        push!(offsets, left_offset + right_offset) # Can add because one will must be 0
+    end
+    return indices .+ offsets
+end
+
+function local_histogram(array::AbstractArray, edges, center, radius)
+    array_axes = axes(array)
+    offset_range = -radius:radius
+    all_offsets = Iterators.product(fill(offset_range, ndims(array))...)
+    hist_vals = zeros(Int, length(edges)-1)
+    for offset in all_offsets
+        location = center .+ offset
+        intensity = array[mirror_index(array_axes, location)...]
+        for i in axes(edges[begin:end-1], 1)
+            if intensity >= edges[i] && intensity < edges[i+1]
+                hist_vals[i] += 1
+            end
+        end
+    end
+
+    return hist_vals
+end
+        
+
 function feature_vector(tomogram::Tomogram, rm::RayMachine, pos)
     # Local properties
-    intensity = tomogram.downsampled[pos...] 
-    # TODO: replace intensity with histogram feature
+    N_bins = 10
+    hist_edges = LinRange(0, 1, N_bins+1)
+    hist_radius = 2
+    histogram = local_histogram(tomogram.downsampled, hist_edges, pos, hist_radius)
 
     # Spatial properties
     # Find locations of closest contours in flat angles.
@@ -145,7 +178,7 @@ function feature_vector(tomogram::Tomogram, rm::RayMachine, pos)
 
     # Construct feature vector
     features = [
-        intensity,
+        histogram...,
         rays_distance...,
         rays_orientation...,
         rays_norm...
@@ -153,13 +186,14 @@ function feature_vector(tomogram::Tomogram, rm::RayMachine, pos)
 end
 
 # TESTING
-data = unit_truncate(load_object("data/run_6084.jld2")[100:200, :, :])
+data = unit_truncate(load_object("data/run_6084.jld2")[100:150, 150:250, 150:250])
 tomogram = Tomogram(data; downsamp_factors=[2, 2, 2])
 ray_machine = RayMachine(tomogram)
 
-@time supervox_image, supervox_dict = supervoxelate(tomogram, slico=true)
-@time obs_points = collect.(observation_points(tomogram, supervox_dict, 25))
+supervox_image, supervox_dict = supervoxelate(tomogram)
+#graph = Supervoxels.construct_graph(supervox_image, supervox_dict)
 
+obs_points = collect.(observation_points(tomogram, supervox_dict, 25))
 @showprogress for point in obs_points
     feature_vector(tomogram, ray_machine, point)
 end
