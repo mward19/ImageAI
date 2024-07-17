@@ -6,9 +6,32 @@ using ImageFiltering
 using JLD2
 using Statistics
 using Graphs
+using LinearAlgebra
 using PyCall
 using Infiltrator
 skimage = pyimport("skimage")
+
+struct SupervoxelAnalysis
+    intensities::AbstractArray
+    seg_array::AbstractArray
+    seg_dict::Dict
+    seg_graph::Graph
+    histograms::Dict
+end
+
+function SupervoxelAnalysis(intensities::AbstractArray; histogram_edges=LinRange(0, 1, 11))
+    seg_array, seg_dict = segment(intensities, slico=true)
+    seg_graph = construct_graph(seg_array, seg_dict)
+    histograms = supervoxel_histograms(intensities, seg_dict, histogram_edges)
+    return SupervoxelAnalysis(
+        intensities,
+        seg_array,
+        seg_dict,
+        seg_graph,
+        histograms
+    )
+end
+
 
 """ Returns a dictionary mapping supervoxel indices to a vector containing all pixels in that segmentation, and an array the same size as the image with supervoxel indices. """
 function segment(data, n_segments=100, compactness=1e-1; slico=false)
@@ -74,5 +97,26 @@ function construct_graph(supervoxel_array, supervoxel_dict)
 
     return graph
 end
+
+function supervoxel_histograms(intensities, supervoxel_dict, edges)
+    histograms = Dict()
+    for key in keys(supervoxel_dict)
+        histogram = zeros(length(edges)-1)
+        for voxel in supervoxel_dict[key]
+            intensity = intensities[voxel...]
+            for edge_index in axes(edges[begin:end-1], 1)
+                if intensity >= edges[edge_index] && intensity < edges[edge_index+1]
+                    histogram[edge_index] += 1
+                    break
+                end
+            end
+        end
+
+        histograms[key] = normalize(histogram)
+    end
+
+    return histograms
+end
+
 
 end # module

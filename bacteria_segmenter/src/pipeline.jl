@@ -115,41 +115,44 @@ end
 
 relu(x) = x > 0 ? x : 0
 
-function mirror_index(array_axes, indices)
-    offsets = Vector{Int}()
-    for (axis, index) in zip(array_axes, indices)
-        left_offset  =   2 * relu(firstindex(axis) - index)
-        right_offset = - 2 * relu(index - lastindex(axis))
-        push!(offsets, left_offset + right_offset) # Can add because one will must be 0
-    end
-    return indices .+ offsets
-end
+#function mirror_index(array_axes, indices)
+#    offsets = Vector{Int}()
+#    for (axis, index) in zip(array_axes, indices)
+#        left_offset  =   2 * relu(firstindex(axis) - index)
+#        right_offset = - 2 * relu(index - lastindex(axis))
+#        push!(offsets, left_offset + right_offset) # Can add because one will must be 0
+#    end
+#    return indices .+ offsets
+#end
+#
+#function local_histogram(array::AbstractArray, edges, center, radius)
+#    array_axes = axes(array)
+#    offset_range = -radius:radius
+#    all_offsets = Iterators.product(fill(offset_range, ndims(array))...)
+#    hist_vals = zeros(Int, length(edges)-1)
+#    for offset in all_offsets
+#        location = center .+ offset
+#        intensity = array[mirror_index(array_axes, location)...]
+#        for i in axes(edges[begin:end-1], 1)
+#            if intensity >= edges[i] && intensity < edges[i+1]
+#                hist_vals[i] += 1
+#            end
+#        end
+#    end
+#
+#    return hist_vals
+#end
+    
 
-function local_histogram(array::AbstractArray, edges, center, radius)
-    array_axes = axes(array)
-    offset_range = -radius:radius
-    all_offsets = Iterators.product(fill(offset_range, ndims(array))...)
-    hist_vals = zeros(Int, length(edges)-1)
-    for offset in all_offsets
-        location = center .+ offset
-        intensity = array[mirror_index(array_axes, location)...]
-        for i in axes(edges[begin:end-1], 1)
-            if intensity >= edges[i] && intensity < edges[i+1]
-                hist_vals[i] += 1
-            end
-        end
-    end
-
-    return hist_vals
-end
-        
-
-function feature_vector(tomogram::Tomogram, rm::RayMachine, pos)
+function feature_vector(
+        tomogram::Tomogram,
+        rm::RayMachine,
+        sva::Supervoxels.SupervoxelAnalysis,
+        pos
+    )
     # Local properties
-    N_bins = 10
-    hist_edges = LinRange(0, 1, N_bins+1)
-    hist_radius = 2
-    histogram = local_histogram(tomogram.downsampled, hist_edges, pos, hist_radius)
+    supervoxel_index = sva.seg_array[pos...]
+    histogram = sva.histograms[supervoxel_index]
 
     # Spatial properties
     # Find locations of closest contours in flat angles.
@@ -186,14 +189,16 @@ function feature_vector(tomogram::Tomogram, rm::RayMachine, pos)
 end
 
 # TESTING
-data = unit_truncate(load_object("data/run_6084.jld2")[100:150, 150:250, 150:250])
+data = unit_truncate(load_object("data/run_6084.jld2")[100:200, :, :])
 tomogram = Tomogram(data; downsamp_factors=[2, 2, 2])
 ray_machine = RayMachine(tomogram)
+@time sva = Supervoxels.SupervoxelAnalysis(tomogram.downsampled)
 
-supervox_image, supervox_dict = supervoxelate(tomogram)
+@time v1 = feature_vector(tomogram, ray_machine, sva, [25, 250, 200])
+#supervox_image, supervox_dict = supervoxelate(tomogram)
 #graph = Supervoxels.construct_graph(supervox_image, supervox_dict)
 
-obs_points = collect.(observation_points(tomogram, supervox_dict, 25))
-@showprogress for point in obs_points
-    feature_vector(tomogram, ray_machine, point)
-end
+#obs_points = collect.(observation_points(tomogram, supervox_dict, 25))
+#@showprogress for point in obs_points
+#    feature_vector(tomogram, ray_machine, point)
+#end
