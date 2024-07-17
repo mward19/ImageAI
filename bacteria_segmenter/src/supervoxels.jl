@@ -1,14 +1,8 @@
 module Supervoxels
 
-using Images
-using LocalFilters
-using ImageFiltering
-using JLD2
-using Statistics
 using Graphs
 using LinearAlgebra
 using PyCall
-using Infiltrator
 skimage = pyimport("skimage")
 
 struct SupervoxelAnalysis
@@ -48,7 +42,6 @@ function segment(data, n_segments=100, compactness=1e-1; slico=false)
     pixels_in_seg = Dict()
     for index in Iterators.product(axes(segments)...)
         seg_val = segments[index...]
-        @infiltrate length(keys(pixels_in_seg)) >= 3
         if !haskey(pixels_in_seg, seg_val)
             pixels_in_seg[seg_val] = []
         end

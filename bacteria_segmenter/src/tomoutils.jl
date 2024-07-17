@@ -1,9 +1,7 @@
 module TomoUtils
-export display3d, supervoxels_RGB, rescale, unit_truncate, subsample, supersample
+export display3d, supervoxels_RGB, rescale, unit_truncate, downsample, upsample
 
 using Images
-using BlockArrays
-using Infiltrator
 
 function display3d(orig_data, points=[]; rad=3, interval=1)
     data = RGB.(orig_data)
@@ -52,16 +50,16 @@ function unit_truncate(array::AbstractArray)
     return unit_truncate.(array)
 end
 
-""" Subsample array by a factors which are powers of 2 greater than or equal to 1. """
-function subsample(array, factors::AbstractVector)
+""" Downsample array by integer factors greater than or equal to 1. """
+function downsample(array, factors::AbstractVector)
     if length(factors) != ndims(array)
         throw(
             ErrorException("Each element of factors should correspond to an axis of the array.")
         )
     end
     for factor in factors
-        if !ispow2(factor) || factor < 1
-            throw(ErrorException("$factor is not a power of 2 greater than or equal to 2."))
+        if !isinteger(factor) || factor < 1
+            throw(ErrorException("$factor is not an integer greater than or equal to 1."))
         end
     end
 
@@ -70,8 +68,8 @@ function subsample(array, factors::AbstractVector)
     return array[indices...]
 end
 
-""" Inverse of subsample, when the same parameters are used here as were in subsample. """
-function supersample(array, factors::AbstractVector)
+""" Inverse of downsample, when the same parameters are used here as were in downsample. """
+function upsample(array, factors::AbstractVector)
     if length(factors) != ndims(array)
         throw(
             ErrorException("Each element of factors should correspond to an axis of the array.")
@@ -79,17 +77,17 @@ function supersample(array, factors::AbstractVector)
     end
     for factor in factors
         if !ispow2(factor) || factor < 1
-            throw(ErrorException("$factor is not a power of 2 greater than or equal to 2."))
+            throw(ErrorException("$factor is not an integer greater than or equal to 1."))
         end
     end
     
-    supersampled = Array{eltype(array)}(undef, (factors .* size(array))...)
+    upsampled = Array{eltype(array)}(undef, (factors .* size(array))...)
     for index in Iterators.product(axes(array)...)
         ranges = [f*(i-1)+1:f*i for (i, f) in zip(index, factors)]
-        supersampled[ranges...] .= array[index...]
+        upsampled[ranges...] .= array[index...]
     end
 
-    return supersampled
+    return upsampled
 end
 
 end # module

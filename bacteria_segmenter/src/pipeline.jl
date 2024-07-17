@@ -72,7 +72,7 @@ function RayMachine(tomogram::Tomogram)
     )
 end
 
-downsample(data, factors) = TomoUtils.subsample(data, factors)
+downsample(data, factors) = TomoUtils.downsample(data, factors)
 
 function Tomogram(data::AbstractArray; downsamp_factors=[2, 4, 4])
     factors = downsamp_factors
@@ -159,7 +159,6 @@ function feature_vector(
     closest_contours = hcat([Rays.closest_contour(rm.rays_image, pos, θ, γ, false) - pos
     for (θ, γ) in rm.flat_angles]...)
     # PCA to find canonical orientation # TODO: complete canonical orientation
-    @infiltrate Inf in closest_contours || -Inf in closest_contours || NaN in closest_contours
     pca_model = fit(PCA, closest_contours; maxoutdim=2)
     pca_vecs = eigvecs(pca_model)
     #rays_pca = predict(pca_model, closest_contours)
@@ -189,12 +188,12 @@ function feature_vector(
 end
 
 # TESTING
-data = unit_truncate(load_object("data/run_6084.jld2")[100:200, :, :])
+data = unit_truncate(load_object("data/run_6084.jld2")[100:120, 100:120, 100:120])
 tomogram = Tomogram(data; downsamp_factors=[2, 2, 2])
 ray_machine = RayMachine(tomogram)
 @time sva = Supervoxels.SupervoxelAnalysis(tomogram.downsampled)
 
-@time v1 = feature_vector(tomogram, ray_machine, sva, [25, 250, 200])
+@time v1 = feature_vector(tomogram, ray_machine, sva, [5, 5, 5])
 #supervox_image, supervox_dict = supervoxelate(tomogram)
 #graph = Supervoxels.construct_graph(supervox_image, supervox_dict)
 
