@@ -1,6 +1,7 @@
 module Rays
 
 using LinearAlgebra
+using MultivariateStats
 
 struct Image
     intensities::AbstractArray
@@ -9,6 +10,48 @@ struct Image
     gradient_norm::AbstractArray
     grad_calculated::AbstractArray{Bool} # true if gradient has been calculated
     cc_memo::Dict # Memo of closest contours. Key is tuple of angle(s)
+end
+
+struct RayMachine
+    lower_angles
+    flat_angles
+    flat_unit_vectors
+    upper_angles
+    all_angles
+    rays_image::Image
+end
+
+function RayMachine(tomogram)
+    N_θ = 12
+    N_γ = 3
+    θ_options = LinRange(0, 2π, N_θ+1)[begin:end-1] # 2π is a duplicate of 0. Throw away
+    lower_angles = [(θ, -π/12) for θ in θ_options]
+    flat_angles  = [(θ, 0)     for θ in θ_options]
+    upper_angles = [(θ, π/12)  for θ in θ_options]
+    all_angles = vcat(lower_angles..., flat_angles..., upper_angles...)
+    rays_image = Rays.Image(
+        tomogram.downsampled,
+        tomogram.edges,
+        tomogram.gradient,
+        tomogram.gradient_norm
+    )
+
+    flat_unit_vectors = []
+    for (θ, γ) in flat_angles
+        cos_θ = cos(θ)
+        cos_γ = cos(γ)
+        push!(flat_unit_vectors, [cos_θ * cos_γ, sin(θ) * cos_γ, sin(γ)])
+    end
+    flat_unit_vectors = hcat(flat_unit_vectors...)
+
+    return RayMachine(
+        lower_angles,
+        flat_angles,
+        flat_unit_vectors,
+        upper_angles,
+        all_angles,
+        rays_image
+    )
 end
 
 """ Constructs an Image from intensities, contours, gradients, and gradient norms. """
@@ -129,5 +172,50 @@ function get_dist_difference(
     𝐜′ = closest_contour(𝐈, 𝐦, θ′, γ′)
     return (norm(𝐜 - 𝐦) - norm(𝐜′ - 𝐦)) / norm(𝐜 - 𝐦)
 end
+
+function get_normalized_grad(𝐈::Image, 𝐦::Vector)
+    return 𝐈.normalized_gradient[𝐦...]
+end
+
+function get_grad_norm(𝐈::Image, 𝐦::Vector)
+    return 𝐈.gradient_norm[𝐦...]
+end
+
+function feature_vector(
+        rm::RayMachine,
+        pos
+    )
+    # Spatial properties
+    # Find locations of closest contours in flat angles.
+    closest_contours = hcat([closest_contour(rm.rays_image, pos, θ, γ, false) - pos
+                             for (θ, γ) in rm.flat_angles]...)
+    # PCA to find canonical orientation # TODO: complete canonical orientation
+    pca_model = fit(PCA, closest_contours; maxoutdim=2)
+    pca_vecs = eigvecs(pca_model)
+    #rays_pca = predict(pca_model, closest_contours)
+    #angle_indices = angles_max_variance(rm.flat_unit_vectors, pca_vecs)
+    #orientation_angles = angles_max_variance(rm.flat_unit_vectors, pca_vecs)
+
+    offset_θ = atan(pca_vecs[3, 1], pca_vecs[2, 1])
+    # TODO: Implement flipping (essentially a kind of offset_γ)
+    rays_distance = []
+    rays_orientation = []
+    rays_norm = []
+    # rays_distance_difference = [] # TODO: implement
+    for (θ, γ) in rm.all_angles
+        θ += offset_θ
+        push!(rays_distance,    get_distance(rm.rays_image, pos, θ, γ))
+        push!(rays_orientation, get_orientation(rm.rays_image, pos, θ, γ))
+        push!(rays_norm,        get_norm(rm.rays_image, pos, θ, γ))
+    end
+
+    # Construct feature vector
+    return [
+        rays_distance...,
+        rays_orientation...,
+        rays_norm...
+    ]
+end
+
 
 end # module

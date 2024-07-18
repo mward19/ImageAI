@@ -42,11 +42,12 @@ function segment(data, n_segments=100, compactness=1e-1; slico=false)
     pixels_in_seg = Dict()
     for index in Iterators.product(axes(segments)...)
         seg_val = segments[index...]
+
         if !haskey(pixels_in_seg, seg_val)
             pixels_in_seg[seg_val] = []
         end
 
-        push!(pixels_in_seg[seg_val], index)
+        push!(pixels_in_seg[seg_val], collect(index))
     end
 
     return segments, pixels_in_seg
@@ -109,6 +110,18 @@ function supervoxel_histograms(intensities, supervoxel_dict, edges)
     end
 
     return histograms
+end
+
+
+""" Returns a dictionary mapping a supervoxel index to a vector of points to sample. """
+function observation_points(supervoxel_dict, points_per_supervoxel)
+    all_points = Dict{Integer, Vector}()
+    N_keys = length(keys(supervoxel_dict))
+    for key in keys(supervoxel_dict)
+        supervoxel_points = rand(supervoxel_dict[key], floor(Int, points_per_supervoxel))
+        all_points[key] = supervoxel_points
+    end
+    return all_points
 end
 
 
