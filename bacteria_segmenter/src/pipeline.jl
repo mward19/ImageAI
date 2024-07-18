@@ -98,4 +98,5 @@ ray_machine = RayMachine(tomogram)
 @time sva = Supervoxels.SupervoxelAnalysis(tomogram.downsampled)
 
 features = feature_vectors(ray_machine, sva)
-
+classes = nothing
+svm = SVM.SVMUnary(features, classes)
