@@ -47,8 +47,8 @@ function SVMUnary(features::Matrix, classes::Vector)
 end
 
 function test(model::SVMUnary)
-    predictions = svmpredict(model, features_test)
-    results = predictions .== classes_test
+    predictions = svmpredict(model.model, model.features_test)
+    results = (predictions .== model.classes_test)
     return mean(results)
 end
 

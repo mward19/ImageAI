@@ -30,7 +30,7 @@ function RayMachine(tomogram)
     upper_angles = [(θ, π/12)  for θ in θ_options]
     all_angles = vcat(lower_angles..., flat_angles..., upper_angles...)
     rays_image = Rays.Image(
-        tomogram.downsampled,
+        tomogram.filtered,
         tomogram.edges,
         tomogram.gradient,
         tomogram.gradient_norm
@@ -101,7 +101,7 @@ end
 """ Checks if a given location 𝐦 is a contour in the image 𝐈. """
 is_contour(𝐈::Image, 𝐦::Vector) = (0 != 𝐈.contours[floor.(Int, 𝐦)...])
 
-function ray_vector(θ, γ=nothing)
+function unit_vector(θ, γ=nothing)
     if isnothing(γ) # 2D case
         return [cos(θ), sin(θ)]
     else # 3D case
@@ -116,7 +116,7 @@ function closest_contour(𝐈::Image, 𝐦::Vector, θ, γ=nothing, inf_edge=tru
         return loc_in_image(𝐈, 𝐈.cc_memo[(θ, γ)], inf_edge)
     end
     # Otherwise find it
-    step = ray_vector(θ, γ) # Already normalized
+    step = unit_vector(θ, γ) # Already normalized
 
     while in_bounds(𝐈, 𝐦)
         if is_contour(𝐈, 𝐦)
@@ -147,7 +147,7 @@ function get_orientation(𝐈::Image, 𝐦::Vector, θ, γ=nothing)
     if (Inf in 𝐜) || (-Inf in 𝐜)
         return NaN
     end
-    return get_normalized_grad(𝐈, 𝐜) ⋅ ray_vector(θ, γ)
+    return get_normalized_grad(𝐈, 𝐜) ⋅ unit_vector(θ, γ)
 end
 
 """ Norm feature. """
@@ -181,6 +181,16 @@ function get_grad_norm(𝐈::Image, 𝐦::Vector)
     return 𝐈.gradient_norm[𝐦...]
 end
 
+function get_complement(θ, γ=nothing)
+    # 2D case
+    if isnothing(γ)
+        return θ + π/2
+    end
+
+    # 3D case
+    return (θ + π/2, -γ) # Kind of an arbitrary choice. Hopefully that's okay for now
+end
+
 function feature_vector(
         rm::RayMachine,
         pos
@@ -201,19 +211,22 @@ function feature_vector(
     rays_distance = []
     rays_orientation = []
     rays_norm = []
-    # rays_distance_difference = [] # TODO: implement
+    rays_dist_diff = [] # TODO: implement
     for (θ, γ) in rm.all_angles
         θ += offset_θ
         push!(rays_distance,    get_distance(rm.rays_image, pos, θ, γ))
         push!(rays_orientation, get_orientation(rm.rays_image, pos, θ, γ))
         push!(rays_norm,        get_norm(rm.rays_image, pos, θ, γ))
+        θ′, γ′ = get_complement(θ, γ)
+        push!(rays_dist_diff,   get_dist_difference(rm.rays_image, pos, θ, θ′, γ, γ′))
     end
 
     # Construct feature vector
     return [
-        rays_distance...,
+        #rays_distance..., # distance will be misleading due to the different tomogram sizes
         rays_orientation...,
-        rays_norm...
+        rays_norm...,
+        rays_dist_diff...
     ]
 end
 

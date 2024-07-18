@@ -54,6 +54,22 @@ function Tomogram(data::AbstractArray; downsamp_factors=[2, 4, 4])
     return Tomogram(data, downsampled, factors, filtered, gradient, gradient_norm, edges)
 end
 
+struct Segmentation
+    raw_data
+    downsampled
+    factors_downsample
+end
+
+function Segmentation(raw_data; downsamp_factors=[2, 4, 4])
+    factors = downsamp_factors
+    downsampled = downsample(raw_data, factors)
+    return Segmentation(
+        raw_data,
+        downsampled,
+        factors
+    )
+end
+
 function feature_vector(
         rm::RayMachine,
         sva::Supervoxels.SupervoxelAnalysis,
@@ -72,6 +88,7 @@ function feature_vector(
     ]
 end
 
+""" Returns a dictionary mapping supervoxel indices to matrices of feature vectors. """
 function feature_vectors(
         rm::RayMachine,
         sva::Supervoxels.SupervoxelAnalysis,
@@ -92,11 +109,29 @@ function feature_vectors(
 end
 
 # TESTING
-data = unit_truncate(load_object("data/run_6084.jld2")[100:200, :, :])
-tomogram = Tomogram(data; downsamp_factors=[2, 2, 2])
-ray_machine = RayMachine(tomogram)
-@time sva = Supervoxels.SupervoxelAnalysis(tomogram.downsampled)
+filepaths = [
+    ("data/run_6084.jld2", "data/seg_6084_filled.jld2")
+]
 
-features = feature_vectors(ray_machine, sva)
-classes = nothing
-svm = SVM.SVMUnary(features, classes)
+#for (data_file, seg_file) in filepaths
+data_file, seg_file = filepaths[begin]
+indices = (100:130, 300:450, 300:450)
+
+# TODO: determine begin and end of missing wedges
+data = unit_truncate(load_object(data_file))
+seg = load_object(seg_file)
+
+# TODO: Make downsampling dynamic
+downsamp_factors = [2, 2, 2] 
+tomogram = Tomogram(data; downsamp_factors=downsamp_factors) 
+segmentation = Segmentation(seg; downsamp_factors=downsamp_factors)
+ray_machine = RayMachine(tomogram)
+sva = Supervoxels.SupervoxelAnalysis(tomogram.filtered)
+
+features_dict = feature_vectors(ray_machine, sva)
+classes_dict = Supervoxels.classes(sva, segmentation.downsampled)
+
+all_keys = collect(keys(features_dict))
+feature_matrix = hcat([features_dict[k] for k in all_keys]...)
+classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
+                       for k in all_keys]...)

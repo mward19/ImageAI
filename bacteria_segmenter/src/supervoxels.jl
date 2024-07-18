@@ -2,6 +2,7 @@ module Supervoxels
 
 using Graphs
 using LinearAlgebra
+using Statistics
 using PyCall
 skimage = pyimport("skimage")
 
@@ -14,7 +15,7 @@ struct SupervoxelAnalysis
 end
 
 function SupervoxelAnalysis(intensities::AbstractArray; histogram_edges=LinRange(0, 1, 11))
-    seg_array, seg_dict = segment(intensities, slico=true)
+    seg_array, seg_dict = segment(intensities, 600)
     seg_graph = construct_graph(seg_array, seg_dict)
     histograms = supervoxel_histograms(intensities, seg_dict, histogram_edges)
     return SupervoxelAnalysis(
@@ -123,6 +124,33 @@ function observation_points(supervoxel_dict, points_per_supervoxel)
     end
     return all_points
 end
+
+""" Returns the approximate centroids of each supervoxel. """
+function centroids(supervoxel_dict)
+    centroid_dict = Dict()
+    for key in keys(supervoxel_dict)
+        points = supervoxel_dict[key]
+        N_sample = 100
+        sample_points = rand(points, N_sample)
+        centroid = mean(sample_points)
+        centroid_dict[key] = floor.(Int, centroid)
+    end
+    return centroid_dict
+end
+
+""" Returns a dictionary mapping supervoxel indices to their labels. """
+function classes(supervoxel_analyzer::SupervoxelAnalysis, segmentation_array)
+    supervoxel_dict = supervoxel_analyzer.seg_dict
+    class_dict = Dict()
+    centroid_dict = centroids(supervoxel_dict)
+    for key in keys(supervoxel_dict)
+        centroid = centroid_dict[key]
+        class = segmentation_array[centroid...]
+        class_dict[key] = class
+    end
+    return class_dict
+end
+
 
 
 end # module
