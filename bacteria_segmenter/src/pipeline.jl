@@ -3,6 +3,7 @@ include("filters.jl")
 include("tomoutils.jl")
 include("rays.jl")
 include("SVM.jl")
+include("tomoloaders.jl")
 
 import .Supervoxels
 import .TomoUtils
@@ -10,6 +11,7 @@ import .Filters
 import .Rays
 using .Rays: RayMachine
 using .SVM
+using .TomoLoaders
 using JLD2
 using Images
 using ArrayPadding
@@ -21,7 +23,18 @@ using .TomoUtils: downsample
 using MultivariateStats
 using ProgressMeter
 
-using Infiltrator
+using PyCall
+sitk = pyimport("SimpleITK")
+
+function open_mha(filepath)
+    # Read the .mha file using SimpleITK (via PyCall)
+    image = sitk.ReadImage(filepath)
+    # Convert the image to a Julia array
+    numpy_array = sitk.GetArrayFromImage(image)
+    julia_array = convert(Array{Float64}, numpy_array)  # Adjust the data type as needed
+    return julia_array
+end
+
 
 struct Tomogram
     raw_data
@@ -97,7 +110,7 @@ function feature_vectors(
     obs_points = Supervoxels.observation_points(sva.seg_dict, N_per_vox)
     
     vectors_by_supervoxel = Dict{Integer, Matrix}()
-    @showprogress for key in keys(obs_points)
+    @showprogress desc="Calculating feature vectors..." for key in keys(obs_points)
         features = []
         for point in obs_points[key]
             push!(features, feature_vector(rm, sva, point))
@@ -109,29 +122,49 @@ function feature_vectors(
 end
 
 # TESTING
+raw_dir = "data/segmentation_data/raw_tomograms"
+seg_dir = "data/segmentation_data/annotations"
+
 filepaths = [
-    ("data/run_6084.jld2", "data/seg_6084_filled.jld2")
+    (raw_dir * "/dataset_10084/run_6075.mha", seg_dir * "/dataset_10084/membrane_6075.mha"),
+    (raw_dir * "/dataset_10084/run_6076.mha", seg_dir * "/dataset_10084/membrane_6076.mha"),
+    (raw_dir * "/dataset_10084/run_6079.mha", seg_dir * "/dataset_10084/membrane_6079.mha"),
+    (raw_dir * "/dataset_10168/run_8546.mha", seg_dir * "/dataset_10168/membrane_8546.mha")#,
+    #(raw_dir * "/dataset_10201/run_9582.mha", seg_dir * "/dataset_10201/membrane_9582.mha")
 ]
 
-#for (data_file, seg_file) in filepaths
-data_file, seg_file = filepaths[begin]
-indices = (100:130, 300:450, 300:450)
+feature_matrix = nothing
+classes_vector = nothing 
+for (raw_file, seg_file) in filepaths
+    indices = (100:130, 300:350, 300:350)
+    # TODO: determine begin and end of missing wedges
+    println(raw_file)
+    data = unit_truncate(open_mha(raw_file))[indices...]
+    seg = open_mha(seg_file)[indices...]
 
-# TODO: determine begin and end of missing wedges
-data = unit_truncate(load_object(data_file))
-seg = load_object(seg_file)
+    # TODO: Make downsampling dynamic
+    downsamp_factors = [2, 4, 4] 
+    tomogram = Tomogram(data; downsamp_factors=downsamp_factors) 
+    segmentation = Segmentation(seg; downsamp_factors=downsamp_factors)
+    ray_machine = RayMachine(tomogram)
+    sva = Supervoxels.SupervoxelAnalysis(tomogram.filtered)
 
-# TODO: Make downsampling dynamic
-downsamp_factors = [2, 2, 2] 
-tomogram = Tomogram(data; downsamp_factors=downsamp_factors) 
-segmentation = Segmentation(seg; downsamp_factors=downsamp_factors)
-ray_machine = RayMachine(tomogram)
-sva = Supervoxels.SupervoxelAnalysis(tomogram.filtered)
+    features_dict = feature_vectors(ray_machine, sva)
+    classes_dict = Supervoxels.classes(sva, segmentation.downsampled)
 
-features_dict = feature_vectors(ray_machine, sva)
-classes_dict = Supervoxels.classes(sva, segmentation.downsampled)
+    all_keys = collect(keys(features_dict))
+    if isnothing(feature_matrix) && isnothing(classes_vector)
+        global feature_matrix = hcat([features_dict[k] for k in all_keys]...)
+        global classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
+                               for k in all_keys]...)
+    else
+        this_feature_matrix = hcat([features_dict[k] for k in all_keys]...)
+        this_classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
+                                    for k in all_keys]...)
+        feature_matrix = hcat(feature_matrix, this_feature_matrix)
+        classes_vector = vcat(classes_vector, this_classes_vector)
+    end
+end
 
-all_keys = collect(keys(features_dict))
-feature_matrix = hcat([features_dict[k] for k in all_keys]...)
-classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
-                       for k in all_keys]...)
+save_object("features_initial.jld2", feature_matrix)
+save_object("classes_initial.jld2", classes_vector)

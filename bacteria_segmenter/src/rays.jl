@@ -136,7 +136,7 @@ end
 function get_distance(𝐈::Image, 𝐦::Vector, θ, γ=nothing)
     𝐜 = closest_contour(𝐈, 𝐦, θ, γ)
     if (Inf in 𝐜) || (-Inf in 𝐜)
-        return Inf
+        return NaN
     end
     return LinearAlgebra.norm(𝐜 - 𝐦)
 end
@@ -191,6 +191,8 @@ function get_complement(θ, γ=nothing)
     return (θ + π/2, -γ) # Kind of an arbitrary choice. Hopefully that's okay for now
 end
 
+isfinite_vec(v::Vector) = length(v) == +(isfinite.(v)...)
+
 function feature_vector(
         rm::RayMachine,
         pos
@@ -208,12 +210,14 @@ function feature_vector(
 
     offset_θ = atan(pca_vecs[3, 1], pca_vecs[2, 1])
     # TODO: Implement flipping (essentially a kind of offset_γ)
+    rays_no_edge = [] # Flag the vector is no edge was found
     rays_distance = []
     rays_orientation = []
     rays_norm = []
     rays_dist_diff = [] # TODO: implement
     for (θ, γ) in rm.all_angles
         θ += offset_θ
+        push!(rays_no_edge, isfinite_vec(closest_contour(rm.rays_image, pos, θ, γ)) ? 0 : 1)
         push!(rays_distance,    get_distance(rm.rays_image, pos, θ, γ))
         push!(rays_orientation, get_orientation(rm.rays_image, pos, θ, γ))
         push!(rays_norm,        get_norm(rm.rays_image, pos, θ, γ))
@@ -223,6 +227,7 @@ function feature_vector(
 
     # Construct feature vector
     return [
+        rays_no_edge...,
         #rays_distance..., # distance will be misleading due to the different tomogram sizes
         rays_orientation...,
         rays_norm...,
