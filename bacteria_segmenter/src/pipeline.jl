@@ -1,3 +1,5 @@
+module Pipeline
+
 include("supervoxels.jl")
 include("filters.jl")
 include("tomoutils.jl")
@@ -121,21 +123,19 @@ function feature_vectors(
     return vectors_by_supervoxel
 end
 
+end # module
+
+using .Pipeline
+
 # TESTING
 raw_dir = "data/segmentation_data/raw_tomograms"
 seg_dir = "data/segmentation_data/annotations"
 
-filepaths = [
-    (raw_dir * "/dataset_10084/run_6075.mha", seg_dir * "/dataset_10084/membrane_6075.mha"),
-    (raw_dir * "/dataset_10084/run_6076.mha", seg_dir * "/dataset_10084/membrane_6076.mha"),
-    (raw_dir * "/dataset_10084/run_6079.mha", seg_dir * "/dataset_10084/membrane_6079.mha"),
-    (raw_dir * "/dataset_10168/run_8546.mha", seg_dir * "/dataset_10168/membrane_8546.mha")#,
-    #(raw_dir * "/dataset_10201/run_9582.mha", seg_dir * "/dataset_10201/membrane_9582.mha")
-]
+filepaths = TomoLoaders.prepare_train(raw_dir, seg_dir)
 
 feature_matrix = nothing
 classes_vector = nothing 
-for (raw_file, seg_file) in filepaths
+for (id, raw_file, seg_file) in filepaths
     indices = (100:130, 300:350, 300:350)
     # TODO: determine begin and end of missing wedges
     println(raw_file)
@@ -156,7 +156,7 @@ for (raw_file, seg_file) in filepaths
     if isnothing(feature_matrix) && isnothing(classes_vector)
         global feature_matrix = hcat([features_dict[k] for k in all_keys]...)
         global classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
-                               for k in all_keys]...)
+                                      for k in all_keys]...)
     else
         this_feature_matrix = hcat([features_dict[k] for k in all_keys]...)
         this_classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 

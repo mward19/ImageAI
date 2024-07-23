@@ -31,7 +31,7 @@ function open_mha_dir(dirpath)
 end
 
 """ Assumes files end in .mha. """
-function prepare_mha(tomogram_dir, segmentation_dir)
+function prepare_train(tomogram_dir, segmentation_dir)
     training_sets = Vector{Tuple}() # (run_id, tomogram, segmentation)
     
     raw_dict = Dict()
@@ -45,8 +45,7 @@ function prepare_mha(tomogram_dir, segmentation_dir)
             pattern = r"run_(\d+)\.mha"
             m = match(pattern, basename(file))
             id = m.captures[1]
-            @infiltrate
-            raw_dict[id] = open_mha(root * "/" * file)
+            raw_dict[id] = root * "/" * file
         end
     end
 
@@ -58,11 +57,11 @@ function prepare_mha(tomogram_dir, segmentation_dir)
             pattern = r"membrane_(\d+)\.mha"
             m = match(pattern, basename(file))
             id = m.captures[1]
-            seg_dict[id] = open_mha(root * "/" * file)
+            seg_dict[id] = root * "/" * file
         end
     end
 
-    for key in keys(raw_dict)
+    for key in intersect(keys(seg_dict), keys(raw_dict))
         push!(training_sets, (key, raw_dict[key], seg_dict[key]))
     end
 
