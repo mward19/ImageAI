@@ -113,7 +113,7 @@ function filter(data::AbstractArray)
     # Histogram equalization (for even contrast)
     filtered = adjust_histogram(filtered, Equalization(nbins=256))
     # Gaussian smoothing to reduce noise
-    gauss_rad = floor(Int, min(3, max(xdim, ydim) / 50)) # TODO: dynamic. not as important
+    gauss_rad = floor(Int, max(1, max(xdim, ydim) / 75)) # TODO: dynamic. not as important
     filtered = imfilter(filtered, Kernel.gaussian((gauss_rad, gauss_rad, gauss_rad)))
     # Edge-preserving smoothing (to get rid of distracting junk)
     #@infiltrate
@@ -133,7 +133,10 @@ using Images
 include("tomoutils.jl")
 using .TomoUtils
 
-data = downsample(load_object("data/mba2011-04-12-13.jld2")[75:85, :, :], [2, 4, 4])
+include("tomoloaders.jl")
+using .TomoLoaders
+
+data = downsample(TomoLoaders.open_mha("data/segmentation_data/raw_tomograms/dataset_10084/run_6074.mha")[150:160, :, :], (2,1,1))
 display(Gray.(Filters.rescale(data[5, :, :])))
 filtered = Filters.filter(data)
 display(Gray.(filtered)[5,:,:])

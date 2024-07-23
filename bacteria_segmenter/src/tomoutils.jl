@@ -61,44 +61,30 @@ function unit_truncate(array::AbstractArray)
     return unit_truncate.(array)
 end
 
-""" Downsample array by integer factors greater than or equal to 1. """
-function downsample(array, factors::AbstractVector)
+""" Downsample array by `factors`. """
+function downsample(array, factors::Tuple)
     if length(factors) != ndims(array)
         throw(
             ErrorException("Each element of factors should correspond to an axis of the array.")
         )
     end
-    for factor in factors
-        if !isinteger(factor) || factor < 1
-            throw(ErrorException("$factor is not an integer greater than or equal to 1."))
-        end
-    end
 
-    indices = [firstindex(i_range):factor:lastindex(i_range)
-                for (i_range, factor) in zip(axes(array), factors)]
-    return array[indices...]
+    original_dims = size(array)
+    new_dims = floor.(Int, original_dims ./ factors)
+    return imresize(array, new_dims)
 end
 
-""" Inverse of downsample, when the same parameters are used here as were in downsample. """
-function upsample(array, factors::AbstractVector)
+""" Approximate inverse of downsample. """
+function upsample(array, factors::Tuple)
     if length(factors) != ndims(array)
         throw(
             ErrorException("Each element of factors should correspond to an axis of the array.")
         )
     end
-    for factor in factors
-        if !ispow2(factor) || factor < 1
-            throw(ErrorException("$factor is not an integer greater than or equal to 1."))
-        end
-    end
-    
-    upsampled = Array{eltype(array)}(undef, (factors .* size(array))...)
-    for index in Iterators.product(axes(array)...)
-        ranges = [f*(i-1)+1:f*i for (i, f) in zip(index, factors)]
-        upsampled[ranges...] .= array[index...]
-    end
 
-    return upsampled
+    original_dims = size(array)
+    new_dims = floor.(Int, original_dims .* factors)
+    return imresize(array, new_dims)
 end
 
 end # module
