@@ -2,20 +2,22 @@ module TomoUtils
 export display3d, supervoxels_RGB, rescale, unit_truncate, downsample, upsample
 
 using Images
+using ProgressMeter
 
-function display3d(orig_data, points=[]; rad=3, interval=1, colors=[RGB(1,0,0)])
+function display3d(orig_data, points=[]; rad=1, interval=1, colors=[RGB(1,0,0)])
     data = RGB.(orig_data)
     Δ = rad
     for slice_index in axes(data, 1)
         if slice_index % interval != 0
             continue
         end
-        for (p_index, p) in enumerate(points)
+        @showprogress desc="Marking points..." for (p_index, p) in enumerate(points)
             if p[1] == slice_index
-                for index in Iterators.product(p[1]-Δ:p[1]+Δ, p[2]-Δ:p[2]+Δ, p[3]-Δ:p[3]+Δ)
-                    if !in_bounds(data, index)   continue   end
-                    data[index...] = colors[begin + (p_index-1) % length(colors)]
-                end
+                data[p...] = colors[begin + (p_index-1) % length(colors)]
+                #for index in Iterators.product(p[1]-Δ:p[1]+Δ, p[2]-Δ:p[2]+Δ, p[3]-Δ:p[3]+Δ)
+                #    if !in_bounds(data, index)   continue   end
+                #    data[index...] = colors[begin + (p_index-1) % length(colors)]
+                #end
             end
         end
         display(data[slice_index, :, :])
@@ -44,6 +46,14 @@ function supervoxels_RGB(segments, n_segments=nothing)
     return segments_display
 end
 
+function supervoxels_marked(original, segments, mark)   
+    segments_display = Array{RGB}(undef, size(segments)...)
+    for i in Iterators.product(axes(segments)...)
+        segments_display[i...] = segments[i...] in mark ? RGB(1,0,0) : RGB(original[i...])
+    end
+
+    return segments_display
+end
 
 function rescale(array)
     global_min = min(array...)

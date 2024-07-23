@@ -86,7 +86,8 @@ end
 function rescale(array)
     global_min = min(array...)
     global_max = max(array...)
-    return (array .- global_min) ./ (global_max - global_min)
+    rescaled = (array .- global_min) ./ (global_max - global_min)
+    return replace(rescaled, NaN=>0)
 end
 
 function score(segmentation::AbstractArray, filtered::AbstractArray)
@@ -116,7 +117,6 @@ function filter(data::AbstractArray)
     gauss_rad = floor(Int, max(1, max(xdim, ydim) / 75)) # TODO: dynamic. not as important
     filtered = imfilter(filtered, Kernel.gaussian((gauss_rad, gauss_rad, gauss_rad)))
     # Edge-preserving smoothing (to get rid of distracting junk)
-    #@infiltrate
     rad = floor(Int, min(max(xdim, ydim) / 40, 5)) # TODO: dynamic. not as important
     filtered = guided_filter(filtered, filtered, rad, 0.05) # TODO: make 0.05 dynamic. Also big rad is expensive
 
@@ -136,8 +136,10 @@ using .TomoUtils
 include("tomoloaders.jl")
 using .TomoLoaders
 
-data = downsample(TomoLoaders.open_mha("data/segmentation_data/raw_tomograms/dataset_10084/run_6074.mha")[150:160, :, :], (2,1,1))
-display(Gray.(Filters.rescale(data[5, :, :])))
-filtered = Filters.filter(data)
-display(Gray.(filtered)[5,:,:])
+function test()
+    data = downsample(TomoLoaders.open_mha("data/segmentation_data/raw_tomograms/dataset_10084/run_6074.mha")[150:160, :, :], (2,1,1))
+    display(Gray.(Filters.rescale(data[5, :, :])))
+    filtered = Filters.filter(data)
+    display(Gray.(filtered)[5,:,:])
+end
 end # module Tst

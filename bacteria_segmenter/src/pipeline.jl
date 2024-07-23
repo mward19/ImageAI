@@ -28,6 +28,8 @@ using ProgressMeter
 using PyCall
 sitk = pyimport("SimpleITK")
 
+export Tomogram, Segmentation, feature_vectors, RayMachine, open_mha, unit_truncate
+
 function open_mha(filepath)
     # Read the .mha file using SimpleITK (via PyCall)
     image = sitk.ReadImage(filepath)
@@ -48,7 +50,7 @@ struct Tomogram
     edges    # From downsampled
 end
 
-function Tomogram(data::AbstractArray; downsamp_factors=[2, 4, 4])
+function Tomogram(data::AbstractArray; downsamp_factors=(2, 4, 4))
     factors = downsamp_factors
     downsampled = downsample(data, factors)
     filtered = Filters.filter(downsampled)
@@ -75,7 +77,7 @@ struct Segmentation
     factors_downsample
 end
 
-function Segmentation(raw_data; downsamp_factors=[2, 4, 4])
+function Segmentation(raw_data; downsamp_factors=(2, 4, 4))
     factors = downsamp_factors
     downsampled = downsample(raw_data, factors)
     return Segmentation(
@@ -125,46 +127,91 @@ end
 
 end # module
 
-using .Pipeline
+#module Tst
+using ..Pipeline
+using ..Pipeline.Supervoxels
+using ..Pipeline.TomoLoaders
+using JLD2
+using Statistics
 
-# TESTING
-raw_dir = "data/segmentation_data/raw_tomograms"
-seg_dir = "data/segmentation_data/annotations"
+function generate_training(
+        raw_dir="data/segmentation_data/raw_tomograms",
+        seg_dir="data/segmentation_data/annotations"
+    )
 
-filepaths = TomoLoaders.prepare_train(raw_dir, seg_dir)
+    filepaths = TomoLoaders.prepare_train(raw_dir, seg_dir)
 
-feature_matrix = nothing
-classes_vector = nothing 
-for (id, raw_file, seg_file) in filepaths
-    indices = (100:130, 300:350, 300:350)
-    # TODO: determine begin and end of missing wedges
-    println(raw_file)
-    data = unit_truncate(open_mha(raw_file))[indices...]
-    seg = open_mha(seg_file)[indices...]
+    feature_matrix = nothing
+    classes_vector = nothing 
+    for (id, raw_file, seg_file) in filepaths
+        indices = (100:130, 300:350, 300:350)
+        # TODO: determine begin and end of missing wedges
+        println(raw_file)
+        data = open_mha(raw_file)[indices...]
+        seg = open_mha(seg_file)[indices...]
 
-    # TODO: Make downsampling dynamic
-    downsamp_factors = [2, 4, 4] 
-    tomogram = Tomogram(data; downsamp_factors=downsamp_factors) 
-    segmentation = Segmentation(seg; downsamp_factors=downsamp_factors)
-    ray_machine = RayMachine(tomogram)
-    sva = Supervoxels.SupervoxelAnalysis(tomogram.filtered)
+        # TODO: Make downsampling dynamic
+        downsamp_factors = (2, 4, 4)
+        tomogram = Tomogram(data; downsamp_factors=downsamp_factors) 
+        segmentation = Segmentation(seg; downsamp_factors=downsamp_factors)
+        ray_machine = RayMachine(tomogram)
+        sva = Supervoxels.SupervoxelAnalysis(tomogram.filtered)
 
-    features_dict = feature_vectors(ray_machine, sva)
-    classes_dict = Supervoxels.classes(sva, segmentation.downsampled)
+        features_dict = feature_vectors(ray_machine, sva)
+        classes_dict = Supervoxels.classes(sva, segmentation.downsampled)
 
-    all_keys = collect(keys(features_dict))
-    if isnothing(feature_matrix) && isnothing(classes_vector)
-        global feature_matrix = hcat([features_dict[k] for k in all_keys]...)
-        global classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
-                                      for k in all_keys]...)
-    else
-        this_feature_matrix = hcat([features_dict[k] for k in all_keys]...)
-        this_classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
-                                    for k in all_keys]...)
-        feature_matrix = hcat(feature_matrix, this_feature_matrix)
-        classes_vector = vcat(classes_vector, this_classes_vector)
+        all_keys = collect(keys(features_dict))
+        if isnothing(feature_matrix) && isnothing(classes_vector)
+            global feature_matrix = hcat([features_dict[k] for k in all_keys]...)
+            global classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
+                                        for k in all_keys]...)
+        else
+            this_feature_matrix = hcat([features_dict[k] for k in all_keys]...)
+            this_classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
+                                        for k in all_keys]...)
+            feature_matrix = hcat(feature_matrix, this_feature_matrix)
+            classes_vector = vcat(classes_vector, this_classes_vector)
+        end
+
+        save_object("features_initial.jld2", feature_matrix)
+        save_object("classes_initial.jld2", classes_vector)
     end
 end
 
-save_object("features_initial.jld2", feature_matrix)
-save_object("classes_initial.jld2", classes_vector)
+include("Forests.jl")
+using .Forests
+include("tomoutils.jl")
+using .TomoUtils
+
+function train_unary(
+        features_path="features_initial.jld2", 
+        labels_path="classes_initial.jld2"
+    )
+    fm = load_object(features_path)
+    lv = load_object(labels_path)
+    unary = Forests.UnaryForest(fm, lv, 1)
+    return unary
+end
+
+unary = train_unary()
+tomogram = Tomogram(load_object("data/run_6084.jld2"))
+segmentation = Segmentation(load_object("data/seg_6084_filled.jld2"))
+rm = RayMachine(tomogram)
+sva = Supervoxels.SupervoxelAnalysis(tomogram.filtered)
+
+features_dict = feature_vectors(rm, sva)
+classes_dict = Supervoxels.classes(sva, segmentation.downsampled)
+
+all_keys = collect(keys(features_dict))
+feature_matrix = hcat([features_dict[k] for k in all_keys]...)
+classes_vector = vcat([fill(classes_dict[k], size(features_dict[k])[2]) 
+                                        for k in all_keys]...)
+
+ŷ = Forests.predict(unary, feature_matrix)
+println(mean(classes_vector .== ŷ))
+pred_dict = Forests.predict_dict(unary, features_dict)
+mark = Set([key for (key, pred) in pred_dict if pred != 0])
+
+display3d(TomoUtils.supervoxels_marked(tomogram.downsampled, sva.seg_array, mark))
+
+#end # module Tst

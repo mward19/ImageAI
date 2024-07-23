@@ -2,7 +2,10 @@ module Forests
 
 using Random
 using MLJ
+using ImageContrastAdjustment
+using HistogramThresholding
 using DataFrames
+using StatsBase
 RandomForestRegressor = MLJ.@load RandomForestRegressor pkg=DecisionTree
 
 struct UnaryForest
@@ -38,14 +41,48 @@ function UnaryForest(X::Matrix, y::Vector, train_test_split=0.7)
 end
 
 function test(uf::UnaryForest)
-    ŷ = MLJ.predict(uf.mach, DataFrame(uf.X[:, uf.inds_test]', :auto))
+    ŷ = predict(uf, uf.X[:, uf.inds_test])
     y_truth = uf.y[uf.inds_test]
-    return ŷ, y_truth
+
+    return mean(ŷ .== y_truth)
 end
 
-function predict(uf::UnaryForest, X::Matrix)
+function predict_raw(uf::UnaryForest, X::Matrix)
     X_df = DataFrame(X', :auto)
     return MLJ.predict(uf.mach, X_df)
 end
 
+function predict(uf::UnaryForest, X::Matrix)
+    ŷ = predict_raw(uf, X)
+
+    edges, counts = build_histogram(ŷ, 256)
+    threshold = find_threshold(Yen(), counts[1:end], edges)
+
+    ŷ = [val > threshold ? 1. : 0. for val in ŷ]
+    return ŷ
+end
+
+function predict_dict(uf::UnaryForest, features_dict::Dict)
+    all_keys = collect(keys(features_dict))
+    pred_dict = Dict()
+    for key in all_keys
+        feature_matrix = features_dict[key]
+        ŷ = predict(uf, feature_matrix)
+        pred = mode(ŷ) # TODO: Problem is threshold
+        pred_dict[key] = pred
+    end
+    return pred_dict
+end
+
 end # module
+
+module Tst
+using ..Forests
+using JLD2
+function test()
+    features = load_object("features_initial.jld2")
+    labels = load_object("classes_initial.jld2")
+    uf = Forests.UnaryForest(features, labels, 0.7)
+    println(Forests.test(uf))
+end
+end # module Tst
